@@ -1,0 +1,175 @@
+.container {
+  max-width: 960px;
+}
+
+/*
+ * Custom translucent site header
+ */
+
+.site-header {
+  background-color: rgba(0, 0, 0, .85);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+.site-header a {
+  color: #8e8e8e;
+  transition: color .15s ease-in-out;
+}
+.site-header a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+/*
+ * Dummy devices (replace them with your own or something else entirely!)
+ */
+
+.product-device {
+  position: absolute;
+  right: 10%;
+  bottom: -30%;
+  width: 300px;
+  height: 540px;
+  background-color: #333;
+  border-radius: 21px;
+  transform: rotate(30deg);
+}
+
+.product-device::before {
+  position: absolute;
+  top: 10%;
+  right: 10px;
+  bottom: 10%;
+  left: 10px;
+  content: "";
+  background-color: rgba(255, 255, 255, .1);
+  border-radius: 5px;
+}
+
+.product-device-2 {
+  top: -25%;
+  right: auto;
+  bottom: 0;
+  left: 5%;
+  background-color: #e5e5e5;
+}
+
+
+/*
+ * Extra utilities
+ */
+
+.flex-equal > * {
+  flex: 1;
+}
+@media (min-width: 768px) {
+  .flex-md-equal > * {
+    flex: 1;
+  }
+}
+
+
+.form-control:focus {
+  /* From Bootswatch Flatly theme */
+  border-color: #969fa8;
+  box-shadow: 0 0 0 0.25rem rgb(44 62 80 / 25%);
+}
+
+
+.rot-image {
+  -webkit-animation:spin 4s linear infinite;
+  -moz-animation:spin 4s linear infinite;
+  animation:spin 60s linear infinite;
+}
+@-moz-keyframes spin {
+  100% { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  100% {
+      -webkit-transform: rotate(360deg);
+      transform:rotate(360deg);
+  }
+}
+
+.lead {
+  font-size: 13pt;
+}
+
+main p {
+  font-size: 12pt;
+}
+
+.acknowledgements {
+  font-size: 10pt;
+}
+
+.feature-list {
+  padding-left: 0;
+}
+
+.feature-list li {
+  position: relative;
+  font-size: 10.5pt;
+  margin: 0;
+  padding-left: 50px;
+  list-style: none;
+  text-align: left;
+}
+
+.feature-list li:before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 35px;
+  height: 100%;
+  box-sizing: border-box;
+  background-image: url("leaf.svg");
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 35px;
+}
+
+.human-replica {
+  background-color: #f7f7ff;
+  border: 1px solid #777;
+  border-radius: 10px;
+  padding: 10px 15px;
+  max-width: 300px;
+  text-align: left;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.human-replica:focus-within {
+  border: 2px solid black;
+  padding: 9px 14px;
+}
+
+.human-replica textarea {
+  background-color: #f7f7ff !important;
+  border: none;
+  resize: none;
+  padding: 0;
+}
+
+.human-replica textarea.form-control:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.ai-replica {
+  background-color: #fff7f7;
+  border: 1px solid #777;
+  border-radius: 10px;
+  padding: 10px 15px;
+  max-width: 300px;
+  text-align: left;
+}
+
+.reset-btn {
+  font-size: 10pt;
+}
