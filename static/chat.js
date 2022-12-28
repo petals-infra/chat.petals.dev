@@ -1,6 +1,8 @@
 var sessionId = null;
 var position = 0;
 
+const sepToken = "\n\n";
+
 function reportFail(request, status, message) {
   alert("Request failed.\nstatus = " + status + "\nmessage = " + message);
 }
@@ -24,9 +26,9 @@ function sendReplica() {
   const textarea = $('.human-replica textarea');
   var replicas = [];
   for (var i = position; i < replicaDivs.length - 1; i++) {
-    replicas.push($(replicaDivs[i]).text() + "\n\n");
+    replicas.push($(replicaDivs[i]).text() + sepToken);
   }
-  replicas.push(textarea.val() + "\n\n");
+  replicas.push(textarea.val() + sepToken);
   replicas.push("AI:");
   const inputs = replicas.join("");
 
@@ -56,8 +58,9 @@ function receiveReplica(inputs) {
         return;
       }
 
-      $('.ai-replica .text').last().text($('.ai-replica .text').last().text() + data.outputs);
-      if (!data.outputs.includes("\n\n")) {
+      const lastReplica = $('.ai-replica .text').last();
+      lastReplica.text(lastReplica.text() + data.outputs.replace(sepToken, ""));
+      if (!data.outputs.includes(sepToken)) {
         receiveReplica(null);
       } else {
         $('.loading-animation').remove();

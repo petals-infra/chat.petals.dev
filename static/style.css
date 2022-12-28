@@ -133,13 +133,18 @@ main p {
   background-size: 35px;
 }
 
-.human-replica {
-  background-color: #f7f7ff;
+.human-replica, .ai-replica {
   border: 1px solid #777;
   border-radius: 10px;
   padding: 10px 15px;
+  width: 90%;
   max-width: 300px;
   text-align: left;
+  white-space: pre-wrap;
+}
+
+.human-replica {
+  background-color: #f7f7ff;
   margin-left: auto;
   margin-right: 0;
 }
@@ -163,11 +168,6 @@ main p {
 
 .ai-replica {
   background-color: #fff7f7;
-  border: 1px solid #777;
-  border-radius: 10px;
-  padding: 10px 15px;
-  max-width: 300px;
-  text-align: left;
 }
 
 .reset-btn {
