@@ -6,6 +6,17 @@ HTTP endpoint for [BLOOM-176B](https://huggingface.co/bigscience/bloom) inferenc
 
 Check out [http://chat.petals.ml](http://chat.petals.ml). It uses the HTTP API described below under the hood (see [static/chat.js](static/chat.js)).
 
+How to run it:
+
+```bash
+git clone https://github.com/borzunov/petals-chat.git
+cd petals-chat
+pip install -r requirements.txt
+gunicorn app:app --bind 0.0.0.0:5000 --threads 4 --timeout 300
+```
+
+It is important to use `--threads` (not `--workers`), so reusing inference sessions works correctly.
+
 ## HTTP API Methods
 
 ### POST /api/v1/generate
