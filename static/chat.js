@@ -22,19 +22,19 @@ function sendReplica() {
     return;
   }
 
-  const replicaDivs = $('.human-replica, .ai-replica');
-  const textarea = $('.human-replica textarea');
-  var replicas = [];
-  for (var i = position; i < replicaDivs.length - 1; i++) {
-    replicas.push($(replicaDivs[i]).text() + sepToken);
+  const textarea = $('.human-replica:last textarea');
+  if (textarea.length >= 1) {
+    $('.human-replica:last').text(textarea.val());
+    $('.dialogue').append($('<p class="ai-replica"><span class="text">AI:</span><span class="loading-animation"></span></p>'));
   }
-  replicas.push(textarea.val() + sepToken);
-  replicas.push("AI:");
-  const inputs = replicas.join("");
 
-  replicaDivs.last().text(textarea.val());
-  $('.dialogue').append($('<p class="ai-replica"><span class="text">AI:</span><span class="loading-animation"></span></p>'));
-  position = replicaDivs.length + 1;
+  const replicaDivs = $('.human-replica, .ai-replica .text');
+  var replicas = [];
+  for (var i = position; i < replicaDivs.length; i++) {
+    replicas.push($(replicaDivs[i]).text());
+  }
+  const inputs = replicas.join(sepToken);
+  position = replicaDivs.length;
 
   receiveReplica(inputs);
 }
