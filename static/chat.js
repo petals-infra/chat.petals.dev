@@ -67,8 +67,9 @@ function receiveReplica(inputs) {
       }
 
       const lastReplica = $('.ai-replica .text').last();
-      lastReplica.text(lastReplica.text() + data.outputs.replace(sepToken, ""));
-      if (!data.outputs.includes(sepToken)) {
+      const newText = lastReplica.text() + data.outputs;
+      lastReplica.text(newText.replace(sepToken, ""));
+      if (!newText.includes(sepToken)) {
         receiveReplica(null);
       } else {
         $('.loading-animation').remove();
