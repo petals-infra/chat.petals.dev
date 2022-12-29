@@ -3,8 +3,16 @@ var position = 0;
 
 const sepToken = "\n\n";
 
-function reportFail(request, status, message) {
-  alert("Request failed.\nstatus = " + status + "\nmessage = " + message);
+function handleFailure(_request, _status, message) {
+  const showError = !/Session .+ does not exist/.test(message);
+  if (showError) {
+    alert("Request failed. Retrying.\n" + message);
+  }
+
+  // Open a new inference session and regenerate the prefix
+  sessionId = null;
+  position = 0;
+  sendReplica();
 }
 
 function sendReplica() {
@@ -12,13 +20,13 @@ function sendReplica() {
     $.get('/api/v1/open_inference_session', null, null, "json")
       .done(data => {
         if (!data.ok) {
-          alert(data.traceback);
+          handleFailure(null, null, data.traceback);
           return;
         }
         sessionId = data.session_id;
         sendReplica();
       })
-      .fail(reportFail);
+      .fail(handleFailure);
     return;
   }
 
@@ -54,7 +62,7 @@ function receiveReplica(inputs) {
   $.post('/api/v1/generate', params, null, "json")
     .done(data => {
       if (!data.ok) {
-        alert(data.traceback);
+        handleFailure(null, null, data.traceback);
         return;
       }
 
@@ -70,7 +78,7 @@ function receiveReplica(inputs) {
         upgradeTextArea();
       }
     })
-    .fail(reportFail);
+    .fail(handleFailure);
 }
 
 function upgradeTextArea() {
