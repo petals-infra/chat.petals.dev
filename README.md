@@ -23,7 +23,7 @@ gunicorn app:app --bind 0.0.0.0:5000 --threads 10 --timeout 600
 
 If you develop your own web app, you can use our endpoint at `http://chat.petals.ml/api/v1/...` for research and development, then set up your own backend for production using the commands above. To do that, you need:
 
-- A CPU-only server with 16+ GB RAM for the generation speed of 3-4 sec/token
+- A CPU-only server with 12+ GB RAM for the generation speed of 3-4 sec/token
 - A GPU server with 8+ GB GPU VRAM for the generation speed of 1-1.5 sec/token
 
 > **Note:** Please do not use our endpoint in production - it has a limited throughput, and we may pause or stop it any time.
