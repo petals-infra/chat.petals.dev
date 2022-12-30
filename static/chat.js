@@ -133,10 +133,6 @@ function animateLoading() {
 $(() => {
   upgradeTextArea();
 
-  $('.clear-convo').click(e => {
-    e.preventDefault();
-    resetDialogue();
-  });
   $('.show-few-shot').click(e => {
     e.preventDefault();
     if (resetDialogue()) {
