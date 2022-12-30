@@ -1,12 +1,14 @@
 # Petals Chat
 
-HTTP endpoint for [BLOOM-176B](https://huggingface.co/bigscience/bloom) inference with the [Petals](https://petals.ml) client
+A chat [web app](http://chat.petals.ml) + a HTTP endpoint for BLOOM inference with the [Petals](https://petals.ml) client
 
 ## Interactive Chat
 
-Check out [http://chat.petals.ml](http://chat.petals.ml). It uses the HTTP API described below under the hood (see [static/chat.js](static/chat.js)).
+<div align="center">
+<img src="https://i.imgur.com/p2nwiho.png" width="400px">
+</div>
 
-How to run it:
+You can try it out [here](http://chat.petals.ml) or host the backend on your servers using these commands:
 
 ```bash
 git clone https://github.com/borzunov/petals-chat.git
@@ -15,9 +17,16 @@ pip install -r requirements.txt
 gunicorn app:app --bind 0.0.0.0:5000 --threads 10 --timeout 300
 ```
 
-It is important to use `--threads` (not `--workers`), so reusing inference sessions works correctly.
+> **Note:** It is important to use `--threads` (not `--workers`), so reusing inference sessions works correctly.
 
 ## HTTP API Methods
+
+If you develop your own web app, you can use our endpoint at `http://chat.petals.ml/api/v1/...` for research and development, then set up your own backend for production using the commands above. To do that, you need:
+
+- A CPU-only server with 16+ GB RAM for the generation speed of 3-4 sec/token
+- A GPU server with 8+ GB GPU VRAM for the generation speed of 1-1.5 sec/token
+
+> **Note:** Please do not use our endpoint in production - it has a limited throughput, and we may pause or stop it any time.
 
 ### POST /api/v1/generate
 
