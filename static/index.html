@@ -28,12 +28,13 @@
         <p class="ai-replica"><span class="text">AI: Hi! How can I help you?</span></p>
         <p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>
       </div>
+      <p class="error-box" style="display: none;">Request failed. <a class="retry-link" href="#">Retry</a><br><span class="error-message"></span></p>
 
       <p class="acknowledgements mt-5 pt-5">
         Please do not enter sensitive data and<br>
         follow the model's <a target="_blank" href="https://huggingface.co/bigscience/bloom">terms of use</a>.<br>
         <br>
-        <a href="#" class="show-few-shot px-1">Few-shot mode</a> <a href="#" class="clear-convo px-1">Reset dialogue</a><br>
+        <a class="show-few-shot px-1" href="#">Few-shot mode</a> <a class="clear-convo px-1" href="#">Reset dialogue</a><br>
         Use <b>Shift+Enter</b> to insert newlines.<br>
         <br>
         Built with <a target="_blank" href="https://huggingface.co/bigscience/bloom">BLOOM</a> and <a target="_blank" href="https://petals.ml/">Petals</a>.<br>

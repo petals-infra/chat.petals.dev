@@ -133,7 +133,7 @@ main p {
   background-size: 35px;
 }
 
-.human-replica, .ai-replica {
+.human-replica, .ai-replica, .error-box {
   border: 1px solid #777;
   border-radius: 10px;
   padding: 10px 15px;
@@ -168,6 +168,20 @@ main p {
 
 .ai-replica {
   background-color: #fff7f7;
+}
+
+.error-box {
+  font-size: 10pt;
+  background-color: #fcc;
+  margin-left: auto;
+  margin-right: 0;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.error-message {
+  font-family: monospace;
+  font-size: 8pt;
 }
 
 .reset-btn {

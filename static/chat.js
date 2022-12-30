@@ -3,18 +3,6 @@ var position = 0;
 
 const sepToken = "\n\n";
 
-function handleFailure(_request, _status, message) {
-  const showError = !/Session .+ does not exist/.test(message);
-  if (showError) {
-    alert("Request failed. Retrying.\n" + message);
-  }
-
-  // Open a new inference session and regenerate the prefix
-  sessionId = null;
-  position = 0;
-  sendReplica();
-}
-
 function sendReplica() {
   if (sessionId === null) {
     $.get('/api/v1/open_inference_session', null, null, "json")
@@ -34,6 +22,8 @@ function sendReplica() {
   if (textarea.length >= 1) {
     $('.human-replica:last').text(textarea.val());
     $('.dialogue').append($('<p class="ai-replica"><span class="text">AI:</span><span class="loading-animation"></span></p>'));
+  } else {
+    $('.loading-animation').show();
   }
 
   const replicaDivs = $('.human-replica, .ai-replica .text');
@@ -80,6 +70,26 @@ function receiveReplica(inputs) {
       }
     })
     .fail(handleFailure);
+}
+
+function handleFailure(_request, _status, message) {
+  const showError = !/Session .+ does not exist/.test(message);
+  if (showError) {
+    $('.loading-animation').hide();
+    $('.error-message').text(message);
+    $('.error-box').show();
+  } else {
+    retry();
+  }
+}
+
+function retry() {
+  $('.error-box').hide();
+
+  // Open a new inference session and regenerate the prefix
+  sessionId = null;
+  position = 0;
+  sendReplica();
 }
 
 function upgradeTextArea() {
@@ -140,6 +150,10 @@ $(() => {
       );
       textarea[0].style.height = textarea[0].scrollHeight + "px";
     }
+  });
+  $('.retry-link').click(e => {
+    e.preventDefault();
+    retry();
   });
 
   setInterval(animateLoading, 2000);
