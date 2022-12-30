@@ -73,7 +73,7 @@ function receiveReplica(inputs) {
 }
 
 function handleFailure(_request, _status, message) {
-  const showError = !/Session .+ does not exist/.test(message);
+  const showError = !/Session .+ expired/.test(message);
   if (showError) {
     $('.loading-animation').hide();
     $('.error-message').text(message);

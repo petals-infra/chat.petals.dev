@@ -14,7 +14,7 @@ from petals import DistributedBloomForCausalLM
 MODEL_NAME = "bigscience/bloom-petals"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 SESSION_EXPIRATION = 5 * 60
-MAX_SESSIONS = 10
+MAX_SESSIONS = 30
 
 logger = hivemind.get_logger(__file__)
 
@@ -110,7 +110,7 @@ def generate():
         if session_id is not None:
             with storage_lock:
                 if session_id not in inference_sessions:
-                    raise KeyError(f"Session {session_id} does not exist")
+                    raise KeyError(f"Session {session_id} expired or does not exist")
                 session, session_lock = inference_sessions.get(session_id).value
                 inference_sessions.store(
                     session_id,

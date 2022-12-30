@@ -12,7 +12,7 @@ How to run it:
 git clone https://github.com/borzunov/petals-chat.git
 cd petals-chat
 pip install -r requirements.txt
-gunicorn app:app --bind 0.0.0.0:5000 --threads 4 --timeout 300
+gunicorn app:app --bind 0.0.0.0:5000 --threads 10 --timeout 300
 ```
 
 It is important to use `--threads` (not `--workers`), so reusing inference sessions works correctly.
