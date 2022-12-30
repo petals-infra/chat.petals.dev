@@ -47,6 +47,8 @@ function sendReplica() {
   receiveReplica(inputs);
 }
 
+const textareaHtml = '<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>';
+
 function receiveReplica(inputs) {
   const params = {
     max_new_tokens: 1,
@@ -73,9 +75,7 @@ function receiveReplica(inputs) {
         receiveReplica(null);
       } else {
         $('.loading-animation').remove();
-        $('.dialogue').append(
-          $('<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>')
-        );
+        $('.dialogue').append($(textareaHtml));
         upgradeTextArea();
       }
     })
@@ -89,11 +89,27 @@ function upgradeTextArea() {
   textarea.focus();
 
   textarea.on('keypress', e => {
-    if (e.which == 13) {
-      sendReplica();
+    if (e.which == 13 && !e.shiftKey) {
       e.preventDefault();
+      sendReplica();
     }
   });
+}
+
+function resetDialogue() {
+  if ($('.human-replica textarea').length == 0) {
+    alert("Can't reset the dialogue while the AI is writing a response.");
+    return false;
+  }
+  if (!confirm("This will reset the dialogue. Are you sure?")) {
+    return false;
+  }
+
+  $('.dialogue').html(textareaHtml);
+  upgradeTextArea();
+  sessionId = null;
+  position = 0;
+  return true;
 }
 
 const animFrames = ["⌛", "🧠"];
@@ -106,6 +122,25 @@ function animateLoading() {
 
 $(() => {
   upgradeTextArea();
+
+  $('.clear-convo').click(e => {
+    e.preventDefault();
+    resetDialogue();
+  });
+  $('.show-few-shot').click(e => {
+    e.preventDefault();
+    if (resetDialogue()) {
+      const textarea = $('.human-replica textarea');
+      textarea.val(
+        'Human: A cat sat on a mat.\n\n' +
+        'AI: Un gato se sentó en una estera.\n\n' +
+        'Human: A brown fox jumps over the lazy dog.\n\n' +
+        'AI: Un zorro marrón salta sobre el perro perezoso.\n\n' +
+        'Human: Who is the president of the United States?'
+      );
+      textarea[0].style.height = textarea[0].scrollHeight + "px";
+    }
+  });
 
   setInterval(animateLoading, 2000);
 });
