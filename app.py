@@ -14,7 +14,7 @@ from petals import DistributedBloomForCausalLM
 MODEL_NAME = "bigscience/bloom-petals"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 TORCH_DTYPE = torch.bfloat16
-ENABLE_CHUNKING = False
+
 SESSION_EXPIRATION = 5 * 60
 MAX_SESSIONS = 50
 
@@ -26,11 +26,7 @@ def load_model(model_name, device):
     tokenizer = BloomTokenizerFast.from_pretrained(model_name)
 
     logger.info(f"Loading model {model_name}")
-    model = DistributedBloomForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=TORCH_DTYPE,
-        chunk_size_for_efficient_fp16_on_cpu=16384 if ENABLE_CHUNKING else None,
-    )
+    model = DistributedBloomForCausalLM.from_pretrained(model_name, torch_dtype=TORCH_DTYPE)
 
     logger.info(f"Moving {model_name} to {device} device")
     model = model.to(device)
