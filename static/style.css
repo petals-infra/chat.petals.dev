@@ -170,6 +170,11 @@ main p {
   background-color: #fff7f7;
 }
 
+.speed {
+  color: #999;
+  font-size: 9pt;
+}
+
 .error-box {
   font-size: 10pt;
   background-color: #fcc;

@@ -13,8 +13,9 @@ from petals import DistributedBloomForCausalLM
 
 MODEL_NAME = "bigscience/bloom-petals"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+TORCH_DTYPE = None  # bfloat16 is default for bloom-petals
 SESSION_EXPIRATION = 5 * 60
-MAX_SESSIONS = 30
+MAX_SESSIONS = 50
 
 logger = hivemind.get_logger(__file__)
 
@@ -24,7 +25,7 @@ def load_model(model_name, device):
     tokenizer = BloomTokenizerFast.from_pretrained(model_name)
 
     logger.info(f"Loading model {model_name}")
-    model = DistributedBloomForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16)
+    model = DistributedBloomForCausalLM.from_pretrained(model_name, torch_dtype=TORCH_DTYPE)
 
     logger.info(f"Moving {model_name} to {device} device")
     model = model.to(device)

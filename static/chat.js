@@ -1,6 +1,8 @@
 var sessionId = null;
 var position = 0;
 
+var totalElapsed, nRequests;
+
 const sepToken = "\n\n";
 
 function sendReplica() {
@@ -21,7 +23,11 @@ function sendReplica() {
   const textarea = $('.human-replica:last textarea');
   if (textarea.length >= 1) {
     $('.human-replica:last').text(textarea.val());
-    $('.dialogue').append($('<p class="ai-replica"><span class="text">AI:</span><span class="loading-animation"></span></p>'));
+    $('.dialogue').append($(
+      '<p class="ai-replica">' +
+        '<span class="text">AI:</span><span class="loading-animation"></span>' +
+        '<span class="speed" style="display: none;"><br>Average speed: <span class="value"></span> sec/token</span>' +
+      '</p>'));
   } else {
     $('.loading-animation').show();
   }
@@ -34,6 +40,8 @@ function sendReplica() {
   const inputs = replicas.join(sepToken);
   position = replicaDivs.length;
 
+  totalElapsed = 0;
+  nRequests = 0;
   receiveReplica(inputs);
 }
 
@@ -51,6 +59,7 @@ function receiveReplica(inputs) {
     params.inputs = inputs;
   }
 
+  const startTime = performance.now();
   $.post('/api/v1/generate', params, null, "json")
     .done(data => {
       if (!data.ok) {
@@ -58,13 +67,23 @@ function receiveReplica(inputs) {
         return;
       }
 
+      if (inputs === null) {
+        totalElapsed += performance.now() - startTime;
+        nRequests++;
+      }
+
       const lastReplica = $('.ai-replica .text').last();
       const newText = lastReplica.text() + data.outputs;
       lastReplica.text(newText.replace(sepToken, ""));
       if (!newText.includes(sepToken)) {
+        if (nRequests >= 1) {
+          $('.speed .value').text((totalElapsed / nRequests / 1000).toFixed(1));
+          $('.speed').show();
+        }
+
         receiveReplica(null);
       } else {
-        $('.loading-animation').remove();
+        $('.loading-animation, .speed').remove();
         $('.dialogue').append($(textareaHtml));
         upgradeTextArea();
       }
