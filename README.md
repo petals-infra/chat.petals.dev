@@ -23,7 +23,7 @@ gunicorn app:app --bind 0.0.0.0:5000 --threads 10 --timeout 600
 
 If you develop your own web app, you can use our endpoint at `http://chat.petals.ml/api/v1/...` for research and development, then set up your own backend for production using the commands above. Requirements for the backend:
 
-- For the generation speed of 1-1.5 sec/token, you need one of the following:
+- For the generation speed of 1-2 sec/token, you need one of the following:
     - A GPU server with 10+ GB GPU VRAM
     - A CPU-only server with 20+ GB RAM (in this case, set `TORCH_DTYPE=torch.float32` in [app.py](app.py))
     - A CPU-only server with 10+ GB RAM and AVX512 support
