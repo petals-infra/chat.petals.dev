@@ -26,7 +26,11 @@ function sendReplica() {
     $('.dialogue').append($(
       '<p class="ai-replica">' +
         '<span class="text">AI:</span><span class="loading-animation"></span>' +
-        '<span class="speed" style="display: none;"><br>Average speed: <span class="value"></span> sec/token</span>' +
+        '<span class="speed" style="display: none;">Average speed: <span class="value"></span> sec/token</span>' +
+        '<span class="suggest-join" style="display: none;">' +
+          'The speed is slower than expected due to a high load. You can increase Petals capacity by ' +
+          '<a target="_blank" href="https://github.com/bigscience-workshop/petals/blob/main/README.md">connecting your GPU</a>.' +
+        '</span>' +
       '</p>'));
   } else {
     $('.loading-animation').show();
@@ -77,13 +81,17 @@ function receiveReplica(inputs) {
       lastReplica.text(newText.replace(sepToken, ""));
       if (!newText.includes(sepToken)) {
         if (nRequests >= 1) {
-          $('.speed .value').text((totalElapsed / nRequests / 1000).toFixed(1));
+          const stepsPerSecond = totalElapsed / nRequests / 1000;
+          $('.speed .value').text(stepsPerSecond.toFixed(1));
           $('.speed').show();
+          if (stepsPerSecond >= 2) {
+            $('.suggest-join').show();
+          }
         }
 
         receiveReplica(null);
       } else {
-        $('.loading-animation, .speed').remove();
+        $('.loading-animation, .speed, .suggest-join').remove();
         $('.dialogue').append($(textareaHtml));
         upgradeTextArea();
       }
