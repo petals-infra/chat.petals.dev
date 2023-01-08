@@ -7,7 +7,7 @@ const sepToken = "\n\n";
 
 function sendReplica() {
   if (sessionId === null) {
-    $.get('/api/v1/open_inference_session?max_length=384', null, null, "json")
+    $.get('/api/v1/open_inference_session?max_length=768', null, null, "json")
       .done(data => {
         if (!data.ok) {
           handleFailure(null, null, data.traceback);
