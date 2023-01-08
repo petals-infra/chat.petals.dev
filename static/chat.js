@@ -28,8 +28,8 @@ function sendReplica() {
         '<span class="text">AI:</span><span class="loading-animation"></span>' +
         '<span class="speed" style="display: none;">Average speed: <span class="value"></span> sec/token</span>' +
         '<span class="suggest-join" style="display: none;">' +
-          'The speed is slower than expected due to a high load. You can increase Petals capacity by ' +
-          '<a target="_blank" href="https://github.com/bigscience-workshop/petals/blob/main/README.md">connecting your GPU</a>.' +
+          'This speed is slower than expected due to a high load. You can increase Petals capacity by ' +
+          '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">connecting your GPU</a>.' +
         '</span>' +
       '</p>'));
   } else {
