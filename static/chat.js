@@ -84,7 +84,7 @@ function receiveReplica(inputs) {
           const stepsPerSecond = totalElapsed / nRequests / 1000;
           $('.speed .value').text(stepsPerSecond.toFixed(1));
           $('.speed').show();
-          if (stepsPerSecond >= 2) {
+          if (stepsPerSecond >= 3) {
             $('.suggest-join').show();
           }
         }
