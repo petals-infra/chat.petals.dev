@@ -119,8 +119,6 @@ def generate():
                     (session, session_lock),
                     hivemind.get_dht_time() + SESSION_EXPIRATION,
                 )
-            if session.position > 0:
-                n_input_tokens += 1  # .generate() returns the last token as well
         else:
             session = None
             session_lock = nullcontext()
