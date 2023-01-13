@@ -133,13 +133,16 @@ main p {
   background-size: 35px;
 }
 
-.human-replica, .ai-replica, .error-box {
+.human-replica, .ai-replica, .welcome, .error-box {
   border: 1px solid #777;
   border-radius: 10px;
   padding: 10px 15px;
   width: 90%;
   max-width: 300px;
   text-align: left;
+}
+
+.human-replica, .ai-replica, .error-box {
   white-space: pre-wrap;
 }
 
@@ -176,6 +179,14 @@ main p {
   font-size: 9pt;
   line-height: 1.25;
   margin-top: 7px;
+}
+
+.welcome {
+  font-size: 10pt;
+  background-color: #fff7f7;
+  margin-left: auto;
+  margin-right: 0;
+  max-width: 350px;
 }
 
 .error-box {
