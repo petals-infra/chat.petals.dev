@@ -99,11 +99,11 @@
 }
 
 main p {
-  font-size: 12pt;
+  font-size: 11pt;
 }
 
 .acknowledgements {
-  font-size: 10pt;
+  font-size: 9pt;
 }
 
 .feature-list {
@@ -162,6 +162,7 @@ main p {
   border: none;
   resize: none;
   padding: 0;
+  font-size: 11pt;
 }
 
 .human-replica textarea.form-control:focus {
@@ -182,7 +183,7 @@ main p {
 }
 
 .welcome {
-  font-size: 10pt;
+  font-size: 9pt;
   background-color: #fff7f7;
   margin-left: auto;
   margin-right: 0;
@@ -204,5 +205,5 @@ main p {
 }
 
 .reset-btn {
-  font-size: 10pt;
+  font-size: 9pt;
 }
