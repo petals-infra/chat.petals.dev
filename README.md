@@ -17,7 +17,7 @@ pip install -r requirements.txt
 gunicorn app:app --bind 0.0.0.0:5000 --threads 10 --timeout 900
 ```
 
-> **Note:** It is important to use `--threads` (not `--workers`), so reusing inference sessions works correctly.
+> **Note:** Python 3.7+ required, and it is important to use `--threads` (not `--workers`) to ensure reusing inference sessions works correctly.
 
 ## HTTP API Methods
 
