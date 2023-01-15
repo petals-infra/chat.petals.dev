@@ -5,22 +5,26 @@ var totalElapsed, nRequests;
 
 const sepToken = "\n\n";
 
+function openSession() {
+  ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
+  ws.onopen = () => {
+    ws.send(JSON.stringify({type: "open_inference_session", max_length: 1024}));
+    ws.onmessage = event => {
+      const response = JSON.parse(event.data);
+      if (!response.ok) {
+        handleFailure(response.traceback);
+        return;
+      }
+
+      sendReplica();
+    };
+  };
+  ws.onclose = event => handleFailure(`Connection closed (reason="${event.reason}", code=${event.code})`);
+}
+
 function sendReplica() {
   if (ws === null) {
-    ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
-    ws.onopen = () => {
-      ws.send(JSON.stringify({type: "open_inference_session", max_length: 1024}));
-      ws.onmessage = event => {
-        const response = JSON.parse(event.data);
-        if (!response.ok) {
-          handleFailure(response.traceback);
-          return;
-        }
-
-        sendReplica();
-      };
-    };
-    ws.onclose = event => handleFailure(`Connection closed (reason="${event.reason}", code=${event.code})`);
+    openSession();
     return;
   }
 

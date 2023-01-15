@@ -25,7 +25,7 @@ If you develop your own web app, you can use our endpoint at `http://chat.petals
 
 - For the generation speed of 1-2 sec/token, you need one of the following:
     - A GPU server with 10+ GB GPU VRAM
-    - A CPU-only server with 20+ GB RAM (in this case, set `TORCH_DTYPE=torch.float32` in [app.py](app.py))
+    - A CPU-only server with 20+ GB RAM (in this case, set `TORCH_DTYPE=torch.float32` in [config.py](config.py))
     - A CPU-only server with 10+ GB RAM and AVX512 support
         - Present on late Intel Xeon CPUs, e.g., on [DigitalOcean](https://digitalocean.com) droplets with a dedicated CPU
     - In future, we may implement using [faiss](https://github.com/facebookresearch/faiss) for generation.
