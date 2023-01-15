@@ -14,10 +14,11 @@ You can try it out [here](http://chat.petals.ml) or host the backend on your ser
 git clone https://github.com/borzunov/petals-chat.git
 cd petals-chat
 pip install -r requirements.txt
-gunicorn app:app --bind 0.0.0.0:5000 --threads 10 --timeout 900
+gunicorn app:app --bind 0.0.0.0:5000 --threads 100 --timeout 900
 ```
 
-> **Note:** Python 3.7+ required, and it is important to use `--threads` (not `--workers`) to ensure reusing inference sessions works correctly.
+> **Note:** Python 3.7+ required, and it is important to use `--threads` (not `--workers`) to ensure the HTTP API reuses inference sessions correctly.
+Each session may use a separate thread, so you need to have as many threads as many concurrent users you'd like to support.
 
 The chat uses the WebSocket API under the hood.
 
