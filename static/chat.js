@@ -1,22 +1,30 @@
-var sessionId = null;
+var ws = null;
 var position = 0;
 
 var totalElapsed, nRequests;
 
 const sepToken = "\n\n";
 
+function openSession() {
+  ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
+  ws.onopen = () => {
+    ws.send(JSON.stringify({type: "open_inference_session", max_length: 1024}));
+    ws.onmessage = event => {
+      const response = JSON.parse(event.data);
+      if (!response.ok) {
+        handleFailure(response.traceback);
+        return;
+      }
+
+      sendReplica();
+    };
+  };
+  ws.onclose = event => handleFailure(`Connection closed (reason="${event.reason}", code=${event.code})`);
+}
+
 function sendReplica() {
-  if (sessionId === null) {
-    $.get('/api/v1/open_inference_session?max_length=768', null, null, "json")
-      .done(data => {
-        if (!data.ok) {
-          handleFailure(null, null, data.traceback);
-          return;
-        }
-        sessionId = data.session_id;
-        sendReplica();
-      })
-      .fail(handleFailure);
+  if (ws === null) {
+    openSession();
     return;
   }
 
@@ -52,54 +60,56 @@ function sendReplica() {
 const textareaHtml = '<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>';
 
 function receiveReplica(inputs) {
-  const params = {
+  const request = {
+    type: "generate",
     max_new_tokens: 1,
     do_sample: 1,
     temperature: 0.75,
     top_p: 0.9,
-    session_id: sessionId,
+    session_id: ws,
+    stop_sequence: sepToken,
   };
   if (inputs !== null) {
-    params.inputs = inputs;
+    request.inputs = inputs;
   }
 
-  const startTime = performance.now();
-  $.post('/api/v1/generate', params, null, "json")
-    .done(data => {
-      if (!data.ok) {
-        handleFailure(null, null, data.traceback);
-        return;
-      }
+  ws.send(JSON.stringify(request));
 
-      if (inputs === null) {
-        totalElapsed += performance.now() - startTime;
-        nRequests++;
-      }
+  var lastMessageTime = null;
+  ws.onmessage = event => {
+    const response = JSON.parse(event.data);
+    if (!response.ok) {
+      handleFailure(response.traceback);
+      return;
+    }
 
-      const lastReplica = $('.ai-replica .text').last();
-      const newText = lastReplica.text() + data.outputs;
-      lastReplica.text(newText.replace(sepToken, ""));
-      if (!newText.includes(sepToken)) {
-        if (nRequests >= 1) {
-          const stepsPerSecond = totalElapsed / nRequests / 1000;
-          $('.speed .value').text(stepsPerSecond.toFixed(1));
-          $('.speed').show();
-          if (stepsPerSecond >= 3) {
-            $('.suggest-join').show();
-          }
+    if (lastMessageTime != null) {
+      totalElapsed += performance.now() - lastMessageTime;
+      nRequests++;
+    }
+    lastMessageTime = performance.now();
+
+    const lastReplica = $('.ai-replica .text').last();
+    const newText = lastReplica.text() + response.outputs;
+    lastReplica.text(newText.replace(sepToken, ""));
+    if (!response.stop) {
+      if (nRequests >= 1) {
+        const stepsPerSecond = totalElapsed / nRequests / 1000;
+        $('.speed .value').text(stepsPerSecond.toFixed(1));
+        $('.speed').show();
+        if (stepsPerSecond >= 3) {
+          $('.suggest-join').show();
         }
-
-        receiveReplica(null);
-      } else {
-        $('.loading-animation, .speed, .suggest-join').remove();
-        $('.dialogue').append($(textareaHtml));
-        upgradeTextArea();
       }
-    })
-    .fail(handleFailure);
+    } else {
+      $('.loading-animation, .speed, .suggest-join').remove();
+      $('.dialogue').append($(textareaHtml));
+      upgradeTextArea();
+    }
+  };
 }
 
-function handleFailure(_request, _status, message) {
+function handleFailure(message) {
   const showError = !/Session .+ expired/.test(message);
   if (showError) {
     $('.loading-animation').hide();
@@ -114,7 +124,10 @@ function retry() {
   $('.error-box').hide();
 
   // Open a new inference session and regenerate the prefix
-  sessionId = null;
+  if (ws != null) {
+    ws.close();
+  }
+  ws = null;
   position = 0;
   sendReplica();
 }
@@ -144,7 +157,11 @@ function resetDialogue() {
 
   $('.dialogue').html(textareaHtml);
   upgradeTextArea();
-  sessionId = null;
+
+  if (ws != null) {
+    ws.close();
+  }
+  ws = null;
   position = 0;
   return true;
 }

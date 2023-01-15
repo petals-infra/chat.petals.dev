@@ -1,3 +1,4 @@
 git+https://github.com/bigscience-workshop/petals
 Flask
+flask-sock
 gunicorn
