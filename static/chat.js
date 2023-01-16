@@ -19,7 +19,25 @@ function openSession() {
       sendReplica();
     };
   };
-  ws.onclose = event => handleFailure(`Connection closed (reason="${event.reason}", code=${event.code})`);
+
+  ws.onerror = _event => handleFailure(`Connection failed`);
+  ws.onclose = _event => {
+    if ($(".error-box").is(":hidden")) {
+      handleFailure(`Connection was closed`);
+    }
+  };
+}
+
+function resetSession() {
+  if (ws !== null && ws.readyState <= 1) {  // If readyState is "connecting" or "opened"
+    ws.close();
+  }
+  ws = null;
+  position = 0;
+}
+
+function isWaitingForInputs() {
+  return $('.human-replica textarea').length >= 1;
 }
 
 function sendReplica() {
@@ -28,9 +46,8 @@ function sendReplica() {
     return;
   }
 
-  const textarea = $('.human-replica:last textarea');
-  if (textarea.length >= 1) {
-    $('.human-replica:last').text(textarea.val());
+  if (isWaitingForInputs()) {
+    $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<p class="ai-replica">' +
         '<span class="text">AI:</span><span class="loading-animation"></span>' +
@@ -110,25 +127,22 @@ function receiveReplica(inputs) {
 }
 
 function handleFailure(message) {
-  const showError = !/Session .+ expired/.test(message);
-  if (showError) {
-    $('.loading-animation').hide();
-    $('.error-message').text(message);
-    $('.error-box').show();
-  } else {
-    retry();
+  resetSession();
+  if (!isWaitingForInputs()) {
+    // Show the error and the retry button only if a user is waiting for the generation results
+    const showError = !/Session .+ expired/.test(message);
+    if (showError) {
+      $('.loading-animation').hide();
+      $('.error-message').text(message);
+      $('.error-box').show();
+    } else {
+      retry();
+    }
   }
 }
 
 function retry() {
   $('.error-box').hide();
-
-  // Open a new inference session and regenerate the prefix
-  if (ws != null) {
-    ws.close();
-  }
-  ws = null;
-  position = 0;
   sendReplica();
 }
 
@@ -147,8 +161,8 @@ function upgradeTextArea() {
 }
 
 function resetDialogue() {
-  if ($('.human-replica textarea').length == 0) {
-    alert("Can't reset the dialogue while the AI is writing a response.");
+  if (!isWaitingForInputs()) {
+    alert("Can't reset the dialogue while the AI is writing a response. Please refresh the page");
     return false;
   }
   if (!confirm("This will reset the dialogue. Are you sure?")) {
@@ -158,11 +172,7 @@ function resetDialogue() {
   $('.dialogue').html(textareaHtml);
   upgradeTextArea();
 
-  if (ws != null) {
-    ws.close();
-  }
-  ws = null;
-  position = 0;
+  resetSession();
   return true;
 }
 

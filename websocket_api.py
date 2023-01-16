@@ -1,6 +1,7 @@
 import json
 from traceback import format_exc
 
+import flask_sock
 import hivemind
 
 import config
@@ -54,6 +55,8 @@ def ws_api_generate(ws):
 
                     logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
                     ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop}))
+    except flask_sock.ConnectionClosed:
+        pass
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
         ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
