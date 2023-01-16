@@ -1,5 +1,6 @@
 var ws = null;
 var position = 0;
+var sessionMaxLength = 1024;
 
 var totalElapsed, nRequests;
 
@@ -8,7 +9,7 @@ const sepToken = "\n\n";
 function openSession() {
   ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
   ws.onopen = () => {
-    ws.send(JSON.stringify({type: "open_inference_session", max_length: 1024}));
+    ws.send(JSON.stringify({type: "open_inference_session", max_length: sessionMaxLength}));
     ws.onmessage = event => {
       const response = JSON.parse(event.data);
       if (!response.ok) {
@@ -130,13 +131,22 @@ function handleFailure(message) {
   resetSession();
   if (!isWaitingForInputs()) {
     // Show the error and the retry button only if a user is waiting for the generation results
-    const showError = !/Session .+ expired/.test(message);
-    if (showError) {
+    var autoRetry = false;
+    if (/Session .+ expired/.test(message)) {
+      autoRetry = true;
+    }
+    const largerMaxLength = 2048;
+    if (/Maximum length exceeded/.test(message) && sessionMaxLength < largerMaxLength) {
+      sessionMaxLength = largerMaxLength;  // We gradually increase sessionMaxLength to save server resources
+      autoRetry = true;
+    }
+
+    if (autoRetry) {
+      retry();
+    } else {
       $('.loading-animation').hide();
       $('.error-message').text(message);
       $('.error-box').show();
-    } else {
-      retry();
     }
   }
 }
