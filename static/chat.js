@@ -6,6 +6,7 @@ var sessionMaxLength = 1024;
 var totalElapsed, nRequests;
 
 const sepToken = "\n\n";
+var stopToken = sepToken;
 
 function openSession() {
   ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
@@ -66,9 +67,17 @@ function sendReplica() {
   const replicaDivs = $('.human-replica, .ai-replica .text');
   var replicas = [];
   for (var i = position; i < replicaDivs.length; i++) {
-    replicas.push($(replicaDivs[i]).text());
+    const el = $(replicaDivs[i]);
+    var phrase = el.text();
+    if (el.is(".human-replica")) {
+      phrase += sepToken;
+    } else
+    if (i < replicaDivs.length - 1) {
+      phrase += stopToken;
+    }
+    replicas.push(phrase);
   }
-  const inputs = replicas.join(sepToken);
+  const inputs = replicas.join("");
   position = replicaDivs.length;
 
   totalElapsed = 0;
@@ -87,7 +96,7 @@ function receiveReplica(inputs) {
     temperature: 0.75,
     top_p: 0.9,
     session_id: ws,
-    stop_sequence: sepToken,
+    stop_sequence: stopToken,
   }));
 
   var lastMessageTime = null;
@@ -106,7 +115,7 @@ function receiveReplica(inputs) {
 
     const lastReplica = $('.ai-replica .text').last();
     const newText = lastReplica.text() + response.outputs;
-    lastReplica.text(newText.replace(sepToken, ""));
+    lastReplica.text(newText.replace(stopToken, ""));
     if (!response.stop) {
       if (nRequests >= 1) {
         const stepsPerSecond = totalElapsed / nRequests / 1000;
@@ -221,6 +230,8 @@ $(() => {
 
     if (resetDialogue()) {
       model = "bigscience/bloomz-petals";
+      stopToken = "</s>";
+
       $('.use-bloomz-text').hide();
       $('.model-name')
         .html('BLOOMZ&#8209;176B')
