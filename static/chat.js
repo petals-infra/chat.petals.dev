@@ -172,7 +172,10 @@ function resetDialogue() {
     alert("Can't reset the dialogue while the AI is writing a response. Please refresh the page");
     return false;
   }
-  if (!confirm("This will reset the dialogue. Are you sure?")) {
+
+  const nDefaultPhrases = 4;
+  if ($('.human-replica, .ai-replica .text').length > nDefaultPhrases &&
+      !confirm("This will reset the dialogue. Are you sure?")) {
     return false;
   }
 
