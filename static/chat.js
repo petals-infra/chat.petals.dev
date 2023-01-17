@@ -196,6 +196,7 @@ $(() => {
 
   $('.show-few-shot').click(e => {
     e.preventDefault();
+
     if (resetDialogue()) {
       const textarea = $('.human-replica textarea');
       textarea.val(
@@ -214,18 +215,18 @@ $(() => {
   });
   $('.use-bloomz').click(e => {
     e.preventDefault();
-    if (!isWaitingForInputs()) {
-      alert("Can't switch the model while the AI is writing a response. Please refresh the page");
-      return false;
+
+    if (resetDialogue()) {
+      model = "bigscience/bloomz-petals";
+      $('.use-bloomz-text').hide();
+      $('.model-name')
+        .html('BLOOMZ&#8209;176B')
+        .attr('href', 'https://huggingface.co/bigscience/bloomz');
+
+      const textarea = $('.human-replica textarea');
+      textarea.val('Human: Write a Python code that prints prime numbers below 100.');
+      textarea[0].style.height = textarea[0].scrollHeight + "px";
     }
-
-    model = "bigscience/bloomz-petals";
-    resetSession();
-
-    $('.use-bloomz-text').hide();
-    $('.model-name')
-      .html('BLOOMZ&#8209;176B')
-      .attr('href', 'https://huggingface.co/bigscience/bloomz');
   });
 
   setInterval(animateLoading, 2000);
