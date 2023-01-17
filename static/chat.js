@@ -216,6 +216,7 @@ $(() => {
         'Human: Who is the president of the United States?'
       );
       textarea[0].style.height = textarea[0].scrollHeight + "px";
+      textarea.focus();
     }
   });
   $('.retry-link').click(e => {
@@ -237,6 +238,7 @@ $(() => {
     $('.model-name')
       .html('BLOOMZ&#8209;176B')
       .attr('href', 'https://huggingface.co/bigscience/bloomz');
+    $('.human-replica textarea').focus();
   });
 
   setInterval(animateLoading, 2000);
