@@ -49,7 +49,7 @@ function sendReplica() {
     $('.dialogue').append($(
       '<p class="ai-replica">' +
         '<span class="text">AI:</span><span class="loading-animation"></span>' +
-        '<span class="speed" style="display: none;">Average speed: <span class="value"></span> sec/token</span>' +
+        '<span class="speed" style="display: none;"></span>' +
         '<span class="suggest-join" style="display: none;">' +
           'This speed is slower than expected due to a high load. You can increase Petals capacity by ' +
           '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">connecting your GPU</a>.' +
@@ -119,8 +119,9 @@ function receiveReplica(inputs) {
     if (!response.stop) {
       if (nRequests >= 1) {
         const stepsPerSecond = totalElapsed / nRequests / 1000;
-        $('.speed .value').text(stepsPerSecond.toFixed(1));
-        $('.speed').show();
+        $('.speed')
+          .text(`Speed: ${stepsPerSecond.toFixed(1)} sec/token, model: ${$('.model-name').text()}`)
+          .show();
         if (stepsPerSecond >= 3) {
           $('.suggest-join').show();
         }
