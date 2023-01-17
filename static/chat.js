@@ -1,17 +1,29 @@
-var model = null;  // Use the default model
+const models = {
+  "bigscience/bloomz-petals": {
+    name: "BLOOMZ-176B",
+    href: "https://huggingface.co/bigscience/bloomz",
+    sepToken: "\n\n",
+    stopToken: "</s>",
+  },
+  "bigscience/bloom-petals": {
+    name: "regular BLOOM-176B",
+    href: "https://huggingface.co/bigscience/bloom",
+    sepToken: "\n\n",
+    stopToken: "\n\n",
+  },
+};
+var curModel = "bigscience/bloomz-petals";
+
 var ws = null;
 var position = 0;
 var sessionMaxLength = 1024;
 
 var totalElapsed, nRequests;
 
-const sepToken = "\n\n";
-var stopToken = sepToken;
-
 function openSession() {
   ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
   ws.onopen = () => {
-    ws.send(JSON.stringify({type: "open_inference_session", model: model, max_length: sessionMaxLength}));
+    ws.send(JSON.stringify({type: "open_inference_session", model: curModel, max_length: sessionMaxLength}));
     ws.onmessage = event => {
       const response = JSON.parse(event.data);
       if (!response.ok) {
@@ -70,10 +82,10 @@ function sendReplica() {
     const el = $(replicaDivs[i]);
     var phrase = el.text();
     if (el.is(".human-replica")) {
-      phrase += sepToken;
+      phrase += models[curModel].sepToken;
     } else
     if (i < replicaDivs.length - 1) {
-      phrase += stopToken;
+      phrase += models[curModel].stopToken;
     }
     replicas.push(phrase);
   }
@@ -96,7 +108,7 @@ function receiveReplica(inputs) {
     temperature: 0.75,
     top_p: 0.9,
     session_id: ws,
-    stop_sequence: stopToken,
+    stop_sequence: models[curModel].stopToken,
   }));
 
   var lastMessageTime = null;
@@ -115,12 +127,12 @@ function receiveReplica(inputs) {
 
     const lastReplica = $('.ai-replica .text').last();
     const newText = lastReplica.text() + response.outputs;
-    lastReplica.text(newText.replace(stopToken, ""));
+    lastReplica.text(newText.replace(models[curModel].stopToken, ""));
     if (!response.stop) {
       if (nRequests >= 1) {
         const stepsPerSecond = totalElapsed / nRequests / 1000;
         $('.speed')
-          .text(`Speed: ${stepsPerSecond.toFixed(1)} sec/token, model: ${$('.model-name').text()}`)
+          .text(`Speed: ${stepsPerSecond.toFixed(1)} sec/token, model: ${models[curModel].name}`)
           .show();
         if (stepsPerSecond >= 3) {
           $('.suggest-join').show();
@@ -224,21 +236,21 @@ $(() => {
     e.preventDefault();
     retry();
   });
-  $('.use-bloomz').click(e => {
+  $('.switch-model').click(e => {
     e.preventDefault();
     if (!isWaitingForInputs()) {
       alert("Can't switch the model while the AI is writing a response. Please refresh the page");
       return false;
     }
 
-    model = "bigscience/bloomz-petals";
-    stopToken = "</s>";
+    const prevModel = curModel;
+    curModel = curModel === "bigscience/bloom-petals" ? "bigscience/bloomz-petals" : "bigscience/bloom-petals";
     resetSession();
 
-    $('.use-bloomz-text').hide();
+    $('.other-model-name').text(models[prevModel].name);
     $('.model-name')
-      .html('BLOOMZ&#8209;176B')
-      .attr('href', 'https://huggingface.co/bigscience/bloomz');
+      .text(models[curModel].name)
+      .attr('href', models[curModel].href);
     $('.human-replica textarea').focus();
   });
 

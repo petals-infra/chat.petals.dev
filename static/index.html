@@ -23,18 +23,12 @@
         </h1>
       </div>
       <p class="welcome">
-        <b>Welcome!</b> This chatbot is a demo app
-        running <a target="_blank" class="model-name" href="https://huggingface.co/bigscience/bloom">BLOOM&#8209;176B</a>
+        <b>Welcome!</b> This chatbot runs
+        <a target="_blank" class="model-name" href="https://huggingface.co/bigscience/bloomz">BLOOMZ-176B</a>
         over the <a target="_blank" href="https://petals.ml">Petals</a> network.
         Please do not enter sensitive data and
         follow the model's <a target="_blank" href="https://huggingface.co/spaces/bigscience/license">terms of use</a>.
         The chat history is recorded.
-        <span class="use-bloomz-text">
-          <br><br>
-          <b>Beta:</b> Click <a class="use-bloomz"href="#">here</a> to switch to BLOOMZ,
-          a version of BLOOM fine-tuned to follow human instructions.
-          It works only if the BLOOMZ swarm is <a target="_blank" href="http://health.petals.ml">healthy</a>.
-        </span>
       </p>
       <div class="dialogue">
         <p class="human-replica">A human talks to a powerful AI that follows the human's instructions.</p>
@@ -45,8 +39,9 @@
       <p class="error-box" style="display: none;">Request failed. <a class="retry-link" href="#">Retry</a><br><span class="error-message"></span></p>
 
       <p class="acknowledgements mt-5 pt-3">
-        Click <a class="show-few-shot" href="#">here</a> to enable few-shot mode.<br>
-        <b>Shift+Enter</b> inserts newlines.<br>
+        <a class="switch-model" href="#">Use <span class="other-model-name">regular BLOOM-176B</span></a> |
+        <a class="show-few-shot" href="#">Few-shot mode</a><br>
+        Use <b>Shift+Enter</b> to insert newlines.<br>
         <br>
         See source code and API docs on <a target="_blank" href="https://github.com/borzunov/petals-chat">GitHub</a>.
       </p>
