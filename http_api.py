@@ -21,7 +21,7 @@ def http_api_open_inference_session():
     try:
         model_name = get_typed_arg("model", str, config.DEFAULT_MODEL_NAME)
         max_length = get_typed_arg("max_length", int, 1024)
-        logger.info(f"open_inference_session(), model="{repr(model_name)}", max_length={max_length}")
+        logger.info(f"open_inference_session(), model={repr(model_name)}, max_length={max_length}")
 
         model, _ = models[model_name]
         with storage_lock:
@@ -52,7 +52,7 @@ def http_api_open_inference_session():
 def http_api_close_inference_session():
     try:
         session_id = request.values.get("session_id")
-        logger.info(f"close_inference_session(), session_id={session_id}")
+        logger.info(f"close_inference_session(), session_id={repr(session_id)}")
 
         with storage_lock:
             del inference_sessions[session_id]
@@ -117,5 +117,5 @@ def http_api_generate():
 
 
 def get_typed_arg(name, expected_type, default=None):
-    value = request.values.get(name, default)
-    return expected_type(value) if value is not None else None
+    value = request.values.get(name)
+    return expected_type(value) if value is not None else default
