@@ -1,3 +1,4 @@
+var model = null;  // Use the default model
 var ws = null;
 var position = 0;
 var sessionMaxLength = 1024;
@@ -9,7 +10,7 @@ const sepToken = "\n\n";
 function openSession() {
   ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
   ws.onopen = () => {
-    ws.send(JSON.stringify({type: "open_inference_session", max_length: sessionMaxLength}));
+    ws.send(JSON.stringify({type: "open_inference_session", model: model, max_length: sessionMaxLength}));
     ws.onmessage = event => {
       const response = JSON.parse(event.data);
       if (!response.ok) {
@@ -42,11 +43,6 @@ function isWaitingForInputs() {
 }
 
 function sendReplica() {
-  if (ws === null) {
-    openSession();
-    return;
-  }
-
   if (isWaitingForInputs()) {
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
@@ -60,6 +56,11 @@ function sendReplica() {
       '</p>'));
   } else {
     $('.loading-animation').show();
+  }
+
+  if (ws === null) {
+    openSession();
+    return;
   }
 
   const replicaDivs = $('.human-replica, .ai-replica .text');
@@ -78,20 +79,16 @@ function sendReplica() {
 const textareaHtml = '<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>';
 
 function receiveReplica(inputs) {
-  const request = {
+  ws.send(JSON.stringify({
     type: "generate",
+    inputs: inputs,
     max_new_tokens: 1,
     do_sample: 1,
     temperature: 0.75,
     top_p: 0.9,
     session_id: ws,
     stop_sequence: sepToken,
-  };
-  if (inputs !== null) {
-    request.inputs = inputs;
-  }
-
-  ws.send(JSON.stringify(request));
+  }));
 
   var lastMessageTime = null;
   ws.onmessage = event => {
@@ -175,7 +172,10 @@ function resetDialogue() {
     alert("Can't reset the dialogue while the AI is writing a response. Please refresh the page");
     return false;
   }
-  if (!confirm("This will reset the dialogue. Are you sure?")) {
+
+  const nDefaultPhrases = 4;
+  if ($('.human-replica, .ai-replica .text').length > nDefaultPhrases &&
+      !confirm("This will reset the dialogue. Are you sure?")) {
     return false;
   }
 
@@ -199,6 +199,7 @@ $(() => {
 
   $('.show-few-shot').click(e => {
     e.preventDefault();
+
     if (resetDialogue()) {
       const textarea = $('.human-replica textarea');
       textarea.val(
@@ -214,6 +215,21 @@ $(() => {
   $('.retry-link').click(e => {
     e.preventDefault();
     retry();
+  });
+  $('.use-bloomz').click(e => {
+    e.preventDefault();
+
+    if (resetDialogue()) {
+      model = "bigscience/bloomz-petals";
+      $('.use-bloomz-text').hide();
+      $('.model-name')
+        .html('BLOOMZ&#8209;176B')
+        .attr('href', 'https://huggingface.co/bigscience/bloomz');
+
+      const textarea = $('.human-replica textarea');
+      textarea.val('Human: Write a Python code that prints prime numbers below 100.');
+      textarea[0].style.height = textarea[0].scrollHeight + "px";
+    }
   });
 
   setInterval(animateLoading, 2000);

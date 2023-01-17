@@ -5,7 +5,7 @@ import flask_sock
 import hivemind
 
 import config
-from app import sock, model, tokenizer
+from app import sock, models
 
 logger = hivemind.get_logger(__file__)
 
@@ -15,8 +15,12 @@ def ws_api_generate(ws):
     try:
         request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
         assert request["type"] == "open_inference_session"
-        logger.info(f"ws.generate.open(), max_length={request['max_length']}")
+        model_name = request.get("model")
+        if model_name is None:
+            model_name = config.DEFAULT_MODEL_NAME
+        logger.info(f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}")
 
+        model, tokenizer = models[model_name]
         with model.inference_session(max_length=request["max_length"]) as session:
             ws.send(json.dumps({"ok": True}))
 

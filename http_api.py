@@ -7,7 +7,7 @@ import hivemind
 from flask import jsonify, request
 
 import config
-from app import app, model, tokenizer
+from app import app, model
 
 logger = hivemind.get_logger(__file__)
 
@@ -19,8 +19,11 @@ inference_sessions = hivemind.TimedStorage()  # Should be used under storage_loc
 @app.get("/api/v1/open_inference_session")
 def http_api_open_inference_session():
     try:
+        model_name = get_typed_arg("model", str, config.DEFAULT_MODEL_NAME)
         max_length = get_typed_arg("max_length", int, 1024)
+        logger.info(f"open_inference_session(), model={repr(model_name)}, max_length={max_length}")
 
+        model, _ = models[model_name]
         with storage_lock:
             if len(inference_sessions) >= config.MAX_SESSIONS:
                 raise RuntimeError(
@@ -49,6 +52,7 @@ def http_api_open_inference_session():
 def http_api_close_inference_session():
     try:
         session_id = request.values.get("session_id")
+        logger.info(f"close_inference_session(), session_id={repr(session_id)}")
 
         with storage_lock:
             del inference_sessions[session_id]
@@ -61,6 +65,7 @@ def http_api_close_inference_session():
 @app.post("/api/v1/generate")
 def http_api_generate():
     try:
+        model_name = get_typed_arg("model", str, config.DEFAULT_MODEL_NAME)
         inputs = request.values.get("inputs")
         do_sample = get_typed_arg("do_sample", int, 0)
         temperature = get_typed_arg("temperature", float, 1.0)
@@ -69,8 +74,9 @@ def http_api_generate():
         max_length = get_typed_arg("max_length", int)
         max_new_tokens = get_typed_arg("max_new_tokens", int)
         session_id = request.values.get("session_id")
-        logger.info(f"generate(), inputs={repr(inputs)}, session_id={session_id}")
+        logger.info(f"generate(), model={repr(model_name)}, session_id={repr(session_id)}, inputs={repr(inputs)}")
 
+        model, tokenizer = models[model_name]
         if inputs is not None:
             inputs = tokenizer(inputs, return_tensors="pt")["input_ids"].to(config.DEVICE)
             n_input_tokens = inputs.shape[1]
@@ -80,7 +86,7 @@ def http_api_generate():
         if session_id is not None:
             with storage_lock:
                 if session_id not in inference_sessions:
-                    raise KeyError(f"Session {session_id} expired or does not exist")
+                    raise KeyError(f"Session {repr(session_id)} expired or does not exist")
                 session, session_lock = inference_sessions.get(session_id).value
                 inference_sessions.store(
                     session_id,
@@ -111,5 +117,5 @@ def http_api_generate():
 
 
 def get_typed_arg(name, expected_type, default=None):
-    value = request.values.get(name, default)
-    return expected_type(value) if value is not None else None
+    value = request.values.get(name)
+    return expected_type(value) if value is not None else default

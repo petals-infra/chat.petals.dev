@@ -11,12 +11,16 @@ import config
 
 logger = hivemind.get_logger(__file__)
 
-logger.info(f"Loading tokenizer for {config.MODEL_NAME}")
-tokenizer = BloomTokenizerFast.from_pretrained(config.MODEL_NAME)
+models = {}
+for model_name in config.MODEL_NAMES:
+    logger.info(f"Loading tokenizer for {model_name}")
+    tokenizer = BloomTokenizerFast.from_pretrained(model_name)
 
-logger.info(f"Loading model {config.MODEL_NAME}")
-model = DistributedBloomForCausalLM.from_pretrained(config.MODEL_NAME, torch_dtype=config.TORCH_DTYPE)
-model = model.to(config.DEVICE)
+    logger.info(f"Loading model {model_name}")
+    model = DistributedBloomForCausalLM.from_pretrained(model_name, torch_dtype=config.TORCH_DTYPE)
+    model = model.to(config.DEVICE)
+
+    models[model_name] = model, tokenizer
 
 logger.info("Starting Flask app")
 app = Flask(__name__)
