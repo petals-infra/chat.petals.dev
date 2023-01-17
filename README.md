@@ -37,6 +37,11 @@ If you develop your own web app, you can use our endpoint at `http://chat.petals
 
 ### Backend's system requirements
 
+- These requirements are for serving either [bigscience/bloom-petals](https://huggingface.co/bigscience/bloom-petals) **or**
+  [bigscience/bloomz-petals](https://huggingface.co/bigscience/bloom-petals).
+  Set the model you'd like to serve in [config.py](config.py).
+  You need 2x of these requirements to serve both.
+
 - For the generation speed of 1-2 sec/token, you need one of the following:
     - A GPU server with 10+ GB GPU VRAM
     - A CPU-only server with 20+ GB RAM (in this case, set `TORCH_DTYPE=torch.float32` in [config.py](config.py))
@@ -68,7 +73,8 @@ The requests must follow this protocol:
 
 ### open_inference_session
 
-The first request must be of type **open_inference_session** and include the `max_length` parameter (int).
+The first request must be of type **open_inference_session** and include the `max_length` parameter (int, required)
+and, optionally, the `model` (str) parameter (default: `config.DEFAULT_MODEL_NAME`).
 
 The inference session created by this request is unique to this WebSocket connection and cannot be reused in other connections.
 It is closed automatically when the connection is closed.
@@ -90,7 +96,7 @@ Response:
 
 The next requests must be of type **generate** and include the same parameters as in the [/api/v1/generate HTTP API](#post-apiv1generate), except for `session_id` (it's identified by the connection you use in the WebSocket API).
 
-A new feature of the WebSocket API is the `stop_sequence` parameter (str). If you set it, the server will continue generation with the same parameters unless it generates the `stop_sequence`, so you may get multiple responses without having to send the request again and wait for the round trip's latency.
+A new feature of the WebSocket API is the `stop_sequence` parameter (str, optional). If you set it, the server will continue generation with the same parameters unless it generates the `stop_sequence`, so you may get multiple responses without having to send the request again and wait for the round trip's latency.
 
 Intermediate responses contain the field `stop: false`, and the last response contains `stop: true`. For example, you can set `max_new_tokens: 1` and receive tokens one by one, as soon as they are generated. Check out the chat's [frontend code](static/chat.js) for a detailed example of how to do that.
 
@@ -113,14 +119,15 @@ Response (one or multiple):
 
 Parameters:
 
-- **inputs** (optional) - New user inputs. May be omitted if you continue generation in an inference session (see below).
-- **do_sample** (optional) - If `0` (default), runs greedy generation. If `1`, performs sampling with parameters below.
-- **temperature** (optional)
-- **top_k** (optional)
-- **top_p** (optional)
-- **max_length** - Max length of generated text (including prefix) in tokens.
-- **max_new_tokens** - Max number of newly generated tokens (excluding prefix).
-- **session_id** (optional) - UUID of an inference session opened earlier (see methods below). This allows you to continue generation later without processing prefix from scratch.
+- **model** (str, optional) - Model name. Default: `config.DEFAULT_MODEL_NAME`.
+- **inputs** (str, optional) - New user inputs. May be omitted if you continue generation in an inference session (see below).
+- **do_sample** (bool, optional) - If `0` (default), runs greedy generation. If `1`, performs sampling with parameters below.
+- **temperature** (float, optional)
+- **top_k** (int, optional)
+- **top_p** (float, optional)
+- **max_length** (int) - Max length of generated text (including prefix) in tokens.
+- **max_new_tokens** (int) - Max number of newly generated tokens (excluding prefix).
+- **session_id** (str, optional) - UUID of an inference session opened earlier (see methods below). This allows you to continue generation later without processing prefix from scratch.
 
 Notes:
 
@@ -138,7 +145,12 @@ Returns (JSON):
 
 Parameters:
 
-- **max_length** (required)
+- **max_length** (int, required)
+- **model** (str, optional) - Model name. Default: `config.DEFAULT_MODEL_NAME`.
+
+Notes:
+
+- If you pass the `model` parameter, you must pass it to all calls of `/api/v1/generate` with this session too.
 
 Returns (JSON):
 
@@ -150,7 +162,7 @@ Returns (JSON):
 
 Parameters:
 
-- **session_id** (required)
+- **session_id** (str, required)
 
 Returns (JSON):
 
