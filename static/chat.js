@@ -67,17 +67,9 @@ function sendReplica() {
   const replicaDivs = $('.human-replica, .ai-replica .text');
   var replicas = [];
   for (var i = position; i < replicaDivs.length; i++) {
-    const el = $(replicaDivs[i]);
-    var phrase = el.text();
-    if (el.is(".human-replica")) {
-      phrase += sepToken;
-    } else
-    if (i < replicaDivs.length - 1) {
-      phrase += stopToken;
-    }
-    replicas.push(phrase);
+    replicas.push($(replicaDivs[i]).text());
   }
-  const inputs = replicas.join("");
+  const inputs = replicas.join(sepToken);
   position = replicaDivs.length;
 
   totalElapsed = 0;
@@ -97,6 +89,7 @@ function receiveReplica(inputs) {
     top_p: 0.9,
     session_id: ws,
     stop_sequence: stopToken,
+    cont_token: sepToken,
   }));
 
   var lastMessageTime = null;
