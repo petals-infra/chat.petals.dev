@@ -1,7 +1,11 @@
+from dataclasses import dataclass
+
 import torch
 
 
-MODEL_NAME = "bigscience/bloom-petals"
+MODEL_NAMES = ["bigscience/bloom-petals", "bigscience/bloomz-petals"]
+DEFAULT_MODEL_NAME = "bigscience/bloom-petals"
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 TORCH_DTYPE = torch.bfloat16
 

@@ -1,3 +1,5 @@
+
+var model = "bigscience/bloom-petals";
 var ws = null;
 var position = 0;
 var sessionMaxLength = 1024;
