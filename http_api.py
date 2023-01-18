@@ -7,7 +7,7 @@ import hivemind
 from flask import jsonify, request
 
 import config
-from app import app, model
+from app import app, models
 
 logger = hivemind.get_logger(__file__)
 
