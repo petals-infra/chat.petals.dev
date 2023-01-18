@@ -4,12 +4,14 @@ const models = {
     href: "https://huggingface.co/bigscience/bloomz",
     sepToken: "\n\n",
     stopToken: "</s>",
+    extraStopSequences: ["\n\nHuman"],
   },
   "bigscience/bloom-petals": {
     name: "regular BLOOM-176B",
     href: "https://huggingface.co/bigscience/bloom",
     sepToken: "\n\n",
     stopToken: "\n\n",
+    extraStopSequences: [],
   },
 };
 var curModel = "bigscience/bloomz-petals";
@@ -109,6 +111,7 @@ function receiveReplica(inputs) {
     top_p: 0.9,
     session_id: ws,
     stop_sequence: models[curModel].stopToken,
+    extra_stop_sequences: models[curModel].extraStopSequences,
   }));
 
   var lastMessageTime = null;
@@ -126,8 +129,13 @@ function receiveReplica(inputs) {
     lastMessageTime = performance.now();
 
     const lastReplica = $('.ai-replica .text').last();
-    const newText = lastReplica.text() + response.outputs;
-    lastReplica.text(newText.replace(models[curModel].stopToken, ""));
+    var newText = lastReplica.text() + response.outputs;
+    newText = newText.replace(models[curModel].stopToken, "");
+    for (const seq of models[curModel].extraStopSequences) {
+      newText = newText.replace(seq, "");
+    }
+    lastReplica.text(newText);
+
     if (!response.stop) {
       if (nRequests >= 1) {
         const stepsPerSecond = totalElapsed / nRequests / 1000;

@@ -37,6 +37,12 @@ def ws_api_generate(ws):
                     n_input_tokens = 0
 
                 stop_sequence = request.get("stop_sequence")
+                extra_stop_sequences = request.get("extra_stop_sequences")
+                if extra_stop_sequences is not None:
+                    cont_token = tokenizer(stop_sequence, return_tensors="pt")["input_ids"].to(config.DEVICE)
+                    assert cont_token.shape == (1, 1), \
+                        "extra_stop_sequences require stop_sequence length to be exactly 1 token"
+
                 all_outputs = ''
                 stop = False
                 while not stop:
@@ -53,7 +59,13 @@ def ws_api_generate(ws):
                     outputs = tokenizer.decode(outputs[0, n_input_tokens:])
                     all_outputs += outputs
 
-                    stop = stop_sequence is None or stop_sequence in all_outputs
+                    stop = stop_sequence is None or all_outputs.endswith(stop_sequence)
+                    if extra_stop_sequences is not None:
+                        for seq in extra_stop_sequences:
+                            if all_outputs.endswith(seq):
+                                stop = True
+                                session.last_token_id = cont_token
+
                     inputs = None  # Inputs are passed only for the 1st token of the bot's response
                     n_input_tokens = 0
 
