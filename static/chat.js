@@ -22,6 +22,12 @@ var sessionMaxLength = 1024;
 
 var totalElapsed, nRequests;
 
+const mode = {
+  CHATBOT: 1,
+  FEW_SHOT: 2,
+};
+let current_mode = mode.CHATBOT;
+
 function openSession() {
   ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
   ws.onopen = () => {
@@ -59,10 +65,12 @@ function isWaitingForInputs() {
 
 function sendReplica() {
   if (isWaitingForInputs()) {
+    const answer_prompt = (current_mode === mode.CHATBOT) ? 'AI:' : '';
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<p class="ai-replica">' +
-        '<span class="text">AI:</span><span class="loading-animation"></span>' +
+        '<span class="text">' + answer_prompt + '</span>' +
+        '<span class="loading-animation"></span>' +
         '<span class="speed" style="display: none;"></span>' +
         '<span class="suggest-join" style="display: none;">' +
           'This speed is slower than expected due to a high load. You can increase Petals capacity by ' +
@@ -147,8 +155,9 @@ function receiveReplica(inputs) {
         }
       }
     } else {
+      const html = (current_mode === mode.CHATBOT) ? textareaHtml : textareaHtml.replace("Human:", "");
       $('.loading-animation, .speed, .suggest-join').remove();
-      $('.dialogue').append($(textareaHtml));
+      $('.dialogue').append($(html));
       upgradeTextArea();
     }
   };
@@ -226,6 +235,7 @@ $(() => {
 
   $('.show-few-shot').click(e => {
     e.preventDefault();
+    current_mode = mode.FEW_SHOT;
 
     if (resetDialogue()) {
       const textarea = $('.human-replica textarea');
