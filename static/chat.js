@@ -71,11 +71,11 @@ function isWaitingForInputs() {
 
 function sendReplica() {
   if (isWaitingForInputs()) {
-    const answer_prompt = (current_mode === mode.CHATBOT) ? 'AI:' : '';
+    const aiPrompt = (current_mode === mode.CHATBOT) ? 'AI:' : '';
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<p class="ai-replica">' +
-        '<span class="text">' + answer_prompt + '</span>' +
+        `<span class="text">${aiPrompt}</span>` +
         '<span class="loading-animation"></span>' +
         '<span class="speed" style="display: none;"></span>' +
         '<span class="suggest-join" style="display: none;">' +
@@ -83,6 +83,7 @@ function sendReplica() {
           '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">connecting your GPU</a>.' +
         '</span>' +
       '</p>'));
+    animateLoading();
   } else {
     $('.loading-animation').show();
   }
@@ -112,8 +113,6 @@ function sendReplica() {
   nRequests = 0;
   receiveReplica(inputs);
 }
-
-const textareaHtml = '<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>';
 
 function receiveReplica(inputs) {
   ws.send(JSON.stringify({
@@ -158,10 +157,8 @@ function receiveReplica(inputs) {
         }
       }
     } else {
-      const html = (current_mode === mode.CHATBOT) ? textareaHtml : textareaHtml.replace("Human:", "");
       $('.loading-animation, .speed, .suggest-join').remove();
-      $('.dialogue').append($(html));
-      upgradeTextArea();
+      appendTextArea();
     }
   };
 }
@@ -195,6 +192,14 @@ function retry() {
   sendReplica();
 }
 
+function appendTextArea() {
+  const humanPrompt = (current_mode === mode.CHATBOT) ? "Human: " : "";
+  $('.dialogue').append($(
+    `<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">${humanPrompt}</textarea></p>`
+  ));
+  upgradeTextArea();
+}
+
 function upgradeTextArea() {
   const textarea = $('.human-replica textarea');
   autosize(textarea);
@@ -218,8 +223,8 @@ function resetDialogue() {
     return false;
   }
 
-  $('.dialogue').html(textareaHtml);
-  upgradeTextArea();
+  $('.dialogue').empty();
+  appendTextArea();
 
   resetSession();
   return true;
