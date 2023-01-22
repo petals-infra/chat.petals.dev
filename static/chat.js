@@ -16,6 +16,12 @@ const models = {
 };
 var curModel = "bigscience/bloomz-petals";
 
+const generationParams = {
+  do_sample: 1,
+  temperature: 0.9,
+  top_k: 40,
+};
+
 var ws = null;
 var position = 0;
 var sessionMaxLength = 1024;
@@ -114,12 +120,9 @@ function receiveReplica(inputs) {
     type: "generate",
     inputs: inputs,
     max_new_tokens: 1,
-    do_sample: 1,
-    temperature: 0.75,
-    top_p: 0.9,
-    session_id: ws,
     stop_sequence: models[curModel].stopToken,
     extra_stop_sequences: models[curModel].extraStopSequences,
+    ...generationParams
   }));
 
   var lastMessageTime = null;
