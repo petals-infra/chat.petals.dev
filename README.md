@@ -8,13 +8,19 @@ A chat [web app](http://chat.petals.ml) + HTTP and WebSocket endpoints for BLOOM
 <img src="https://i.imgur.com/p2nwiho.png" width="400px">
 </div>
 
-You can try it out [here](http://chat.petals.ml) or host the backend on your servers using these commands:
+You can try it out [here](http://chat.petals.ml) or run the backend on your server using these commands:
 
 ```bash
 git clone https://github.com/borzunov/petals-chat.git
 cd petals-chat
 pip install -r requirements.txt
-gunicorn app:app --bind 0.0.0.0:5000 --threads 100 --timeout 900
+flask run --host=0.0.0.0 --port=5000
+```
+
+In production, we recommend using gunicorn instead of the Flask dev server:
+
+```bash
+gunicorn app:app --bind 0.0.0.0:5000 --threads 100 --timeout 1000
 ```
 
 > **Note:** Python 3.7+ required, and it is important to use `--threads` (not `--workers`) to ensure the HTTP API reuses inference sessions correctly.
