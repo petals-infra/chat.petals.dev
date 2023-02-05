@@ -17,7 +17,7 @@ for model_name in config.MODEL_NAMES:
     tokenizer = BloomTokenizerFast.from_pretrained(model_name)
 
     logger.info(f"Loading model {model_name}")
-    model = DistributedBloomForCausalLM.from_pretrained(model_name, torch_dtype=config.TORCH_DTYPE)
+    model = DistributedBloomForCausalLM.from_pretrained(model_name, torch_dtype=config.TORCH_DTYPE, max_retries=3)
     model = model.to(config.DEVICE)
 
     models[model_name] = model, tokenizer
