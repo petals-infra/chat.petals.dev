@@ -11,8 +11,8 @@ A chat [web app](http://chat.petals.ml) + HTTP and WebSocket endpoints for BLOOM
 You can try it out [here](http://chat.petals.ml) or run the backend on your server using these commands:
 
 ```bash
-git clone https://github.com/borzunov/petals-chat.git
-cd petals-chat
+git clone https://github.com/borzunov/chat.petals.ml.git
+cd chat.petals.ml
 pip install -r requirements.txt
 flask run --host=0.0.0.0 --port=5000
 ```
