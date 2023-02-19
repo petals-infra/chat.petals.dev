@@ -1,7 +1,7 @@
 import torch
 
 
-MODEL_NAMES = ["bigscience/bloom-petals", "bigscience/bloomz-petals"]
+MODEL_NAMES = ["bigscience/bloom-petals", "bigscience/bloomz-petals", "bigscience/bloom-7b1-petals"]
 DEFAULT_MODEL_NAME = "bigscience/bloom-petals"
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
