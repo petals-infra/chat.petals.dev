@@ -26,8 +26,6 @@ def ws_api_generate(ws):
 
             while True:
                 request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
-                if ("stop" in request):
-                    continue # Left-over 'stop' command. Ignore
                 assert request["type"] == "generate"
                 inputs = request.get("inputs")
                 logger.info(f"ws.generate.step(), inputs={repr(inputs)}")
@@ -48,15 +46,6 @@ def ws_api_generate(ws):
                 all_outputs = ''
                 stop = False
                 while not stop:
-                    rcvd = ws.receive(timeout=0.001)
-                    if rcvd:
-                        try:
-                            rcvd_json = json.loads(rcvd)
-                            if rcvd_json.get("stop") == True:
-                                stop = True
-                                break
-                        except Exception as e:
-                            logger.warn(f"Exception {e} while processing answer from client: {rcvd}")
                     outputs = model.generate(
                         inputs=inputs,
                         do_sample=request.get("do_sample", False),
