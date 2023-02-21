@@ -165,7 +165,7 @@ function receiveReplica(inputs) {
       }
     } else {
       $('.loading-animation, .speed, .suggest-join, .generation-controls').remove();
-      ws.close();
+      resetSession();
       appendTextArea();
       stop = false;
     }
