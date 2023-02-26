@@ -182,6 +182,10 @@ main p {
   margin-top: 7px;
 }
 
+.generation-controls a {
+  color: #999;
+}
+
 .welcome {
   font-size: 9pt;
   background-color: #fff7f7;
