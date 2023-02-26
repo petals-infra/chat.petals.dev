@@ -33,6 +33,7 @@ const mode = {
   FEW_SHOT: 2,
 };
 let current_mode = mode.CHATBOT;
+let stop = false;
 
 function openSession() {
   ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
@@ -78,12 +79,18 @@ function sendReplica() {
         `<span class="text">${aiPrompt}</span>` +
         '<span class="loading-animation"></span>' +
         '<span class="speed" style="display: none;"></span>' +
+        '<span class="generation-controls"><a class="stop-generation" href=#>stop generation</a></span>' +
         '<span class="suggest-join" style="display: none;">' +
           'This speed is slower than expected due to a high load. You can increase Petals capacity by ' +
           '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">connecting your GPU</a>.' +
         '</span>' +
       '</p>'));
     animateLoading();
+    $('.stop-generation').click(e => {
+      e.preventDefault();
+      console.log("Stop generation");
+      stop = true;
+    });
   } else {
     $('.loading-animation').show();
   }
@@ -146,7 +153,7 @@ function receiveReplica(inputs) {
     }
     lastReplica.text(newText);
 
-    if (!response.stop) {
+    if (!response.stop && !stop) {
       if (nRequests >= 1) {
         const stepsPerSecond = totalElapsed / nRequests / 1000;
         $('.speed')
@@ -157,8 +164,10 @@ function receiveReplica(inputs) {
         }
       }
     } else {
-      $('.loading-animation, .speed, .suggest-join').remove();
+      $('.loading-animation, .speed, .suggest-join, .generation-controls').remove();
+      resetSession();
       appendTextArea();
+      stop = false;
     }
   };
 }
