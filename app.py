@@ -1,6 +1,7 @@
 import hivemind
 import torch
 from flask import Flask
+from flask_cors import CORS
 from flask_sock import Sock
 from transformers import BloomTokenizerFast
 
@@ -24,6 +25,7 @@ for model_name in config.MODEL_NAMES:
 
 logger.info("Starting Flask app")
 app = Flask(__name__)
+CORS(app)
 app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25}
 sock = Sock(app)
 
