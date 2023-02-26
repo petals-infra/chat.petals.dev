@@ -153,7 +153,7 @@ function receiveReplica(inputs) {
     }
     lastReplica.text(newText);
 
-    if (!response.stop && stop == false) {
+    if (!response.stop && !stop) {
       if (nRequests >= 1) {
         const stepsPerSecond = totalElapsed / nRequests / 1000;
         $('.speed')
