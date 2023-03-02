@@ -45,8 +45,8 @@ If you develop your own web app, you can use our endpoint at `http://chat.petals
 
 - These requirements are for serving either [bigscience/bloom-petals](https://huggingface.co/bigscience/bloom-petals) **or**
   [bigscience/bloomz-petals](https://huggingface.co/bigscience/bloom-petals).
-  Set the model you'd like to serve in [config.py](config.py).
-  You need 2x of these requirements to serve both.
+  Set the model you'd like to serve by updating [config.py](config.py) and [static/chat.js](static/chat.js).
+  You need 2x of these requirements to serve both models.
 
 - For the generation speed of 1-2 sec/token, you need one of the following:
     - A GPU server with 10+ GB GPU VRAM
