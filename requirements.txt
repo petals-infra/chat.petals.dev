@@ -3,3 +3,4 @@ Flask
 flask-sock
 flask-cors
 gunicorn
+setuptools>=65.5.1
