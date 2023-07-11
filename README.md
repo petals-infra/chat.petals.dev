@@ -23,9 +23,6 @@ In production, we recommend using gunicorn instead of the Flask dev server:
 gunicorn app:app --bind 0.0.0.0:5000 --threads 100 --timeout 1000
 ```
 
-> **Note:** Python 3.7+ required, and it is important to use `--threads` (not `--workers`) to ensure the HTTP API reuses inference sessions correctly.
-Each session may use a separate thread, so you need to have as many threads as many concurrent users you'd like to support.
-
 The chat uses the WebSocket API under the hood.
 
 ## APIs
@@ -43,21 +40,23 @@ If you develop your own web app, you can use our endpoint at `http://chat.petals
 
 ### Backend's system requirements
 
-- These requirements are for serving either [bigscience/bloom-petals](https://huggingface.co/bigscience/bloom-petals) **or**
-  [bigscience/bloomz-petals](https://huggingface.co/bigscience/bloom-petals).
-  Set the model you'd like to serve by updating [config.py](config.py) and [static/chat.js](static/chat.js).
-  You need 2x of these requirements to serve both models.
+- If you use a CPU-only server, you need enough RAM to fit embeddings for all models (see the table below).
 
-- For the generation speed of 1-2 sec/token, you need one of the following:
-    - A GPU server with 10+ GB GPU VRAM
-    - A CPU-only server with 20+ GB RAM (in this case, set `TORCH_DTYPE=torch.float32` in [config.py](config.py))
-    - A CPU-only server with 10+ GB RAM and AVX512 support
-        - Present on late Intel Xeon CPUs, e.g., on [DigitalOcean](https://digitalocean.com) droplets with a dedicated CPU
-    - In future, we may implement using [faiss](https://github.com/facebookresearch/faiss) for generation.
-        This would allow to use any CPU-only server with 8+ GB RAM for fast **approximate** greedy and top-k generation.
+  If your CPU supports AVX512, the embeddings will be loaded in 16-bit, otherwise they will be loaded in 32-bit (= 2x more memory).
+  This is because multiplying 16-bit weights without AVX512 is slow and may introduce a slowdown of 1-2 sec/token.
+  AVX512 support is available on late Intel Xeon CPUs
+  (e.g., on [DigitalOcean](https://digitalocean.com) droplets with a dedicated CPU).
 
-- For the generation speed of 3-4 sec/token, you need:
-    - A CPU-only server with 10+ GB RAM
+- If you use a GPU server, you need enough GPU memory to fit the embeddings for all models.
+  The embeddings will be loaded in 16-bit.
+
+- You don't have to serve all models. If you don't have enough memory, remove some models in [config.py](config.py).
+
+| Model | Embeds in 16-bit | Embeds in 32-bit |
+| --- | --- | --- |
+| LLaMA-65B | 1.05 GB | 2.1 GB |
+| BLOOM-176B | 7.19 GB | 14.38 GB |
+| BLOOMZ-176B | 7.19 GB | 14.38 GB |
 
 ## WebSocket API (`/api/v2/generate`)
 

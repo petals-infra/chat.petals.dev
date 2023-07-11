@@ -17,7 +17,7 @@ for model_name in config.MODEL_NAMES:
     tokenizer = AutoTokenizer.from_pretrained(model_name, add_bos_token=False, use_fast=False)
     # We set use_fast=False since LlamaTokenizerFast takes a long time to init
 
-    logger.info(f"Loading model {model_name}")
+    logger.info(f"Loading model {model_name} with dtype {config.TORCH_DTYPE}")
     model = AutoDistributedModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=config.TORCH_DTYPE,
