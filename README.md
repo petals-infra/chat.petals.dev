@@ -1,11 +1,11 @@
 # Petals Chat
 
-A chat [web app](http://chat.petals.ml) + HTTP and WebSocket endpoints for BLOOM inference with the [Petals](https://petals.ml) client
+A chatbot [web app](http://chat.petals.ml) + HTTP and WebSocket endpoints for LLM inference with the [Petals](https://petals.ml) client
 
 ## Interactive Chat
 
 <div align="center">
-<img src="https://i.imgur.com/p2nwiho.png" width="400px">
+<img src="https://i.imgur.com/QVTzc6u.png" width="600px">
 </div>
 
 You can try it out [here](http://chat.petals.ml) or run the backend on your server using these commands:
