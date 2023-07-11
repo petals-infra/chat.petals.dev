@@ -1,11 +1,10 @@
 import hivemind
-import torch
 from flask import Flask
 from flask_cors import CORS
 from flask_sock import Sock
-from transformers import BloomTokenizerFast
+from transformers import AutoTokenizer
 
-from petals import DistributedBloomForCausalLM
+from petals import AutoDistributedModelForCausalLM
 
 import config
 
@@ -15,10 +14,11 @@ logger = hivemind.get_logger(__file__)
 models = {}
 for model_name in config.MODEL_NAMES:
     logger.info(f"Loading tokenizer for {model_name}")
-    tokenizer = BloomTokenizerFast.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, add_bos_token=False, use_fast=False)
+    # We set use_fast=False since LlamaTokenizerFast takes a long time to init
 
     logger.info(f"Loading model {model_name}")
-    model = DistributedBloomForCausalLM.from_pretrained(
+    model = AutoDistributedModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=config.TORCH_DTYPE,
         initial_peers=config.INITIAL_PEERS,

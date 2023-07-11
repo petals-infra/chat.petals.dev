@@ -3,6 +3,7 @@ from traceback import format_exc
 
 import flask_sock
 import hivemind
+import torch
 
 import config
 from app import sock, models
@@ -21,6 +22,8 @@ def ws_api_generate(ws):
         logger.info(f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}")
 
         model, tokenizer = models[model_name]
+        fake_token = tokenizer("^")["input_ids"][0]  # Workaround to make SentencePiece .decode() keep leading spaces
+
         with model.inference_session(max_length=request["max_length"]) as session:
             ws.send(json.dumps({"ok": True}))
 
@@ -56,7 +59,7 @@ def ws_api_generate(ws):
                         max_new_tokens=request.get("max_new_tokens"),
                         session=session,
                     )
-                    outputs = tokenizer.decode(outputs[0, n_input_tokens:])
+                    outputs = tokenizer.decode([fake_token] + outputs[0, n_input_tokens:].tolist())[1:]
                     all_outputs += outputs
 
                     stop = stop_sequence is None or all_outputs.endswith(stop_sequence)
