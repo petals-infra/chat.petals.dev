@@ -1,24 +1,31 @@
 const models = {
-  "bigscience/bloomz-petals": {
-    name: "BLOOMZ-176B",
-    href: "https://huggingface.co/bigscience/bloomz",
+  "enoch/llama-65b-hf": {
+    modelCard: "https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md",
+    license: "https://bit.ly/llama-license",
+    sepToken: "\n\n",
+    stopToken: "\n\n",
+    extraStopSequences: null,
+  },
+  "bigscience/bloom": {
+    modelCard: "https://huggingface.co/bigscience/bloom",
+    license: "https://bit.ly/bloom-license",
+    sepToken: "\n\n",
+    stopToken: "\n\n",
+    extraStopSequences: null,
+  },
+  "bigscience/bloomz": {
+    modelCard: "https://huggingface.co/bigscience/bloomz",
+    license: "https://bit.ly/bloom-license",
     sepToken: "\n\n",
     stopToken: "</s>",
     extraStopSequences: ["\n\nHuman"],
   },
-  "bigscience/bloom-petals": {
-    name: "regular BLOOM-176B",
-    href: "https://huggingface.co/bigscience/bloom",
-    sepToken: "\n\n",
-    stopToken: "\n\n",
-    extraStopSequences: [],
-  },
 };
-var curModel = "bigscience/bloomz-petals";
+var curModel = "enoch/llama-65b-hf";
 
 const generationParams = {
   do_sample: 1,
-  temperature: 0.9,
+  temperature: 0.7,
   top_k: 40,
 };
 
@@ -81,8 +88,9 @@ function sendReplica() {
         '<span class="speed" style="display: none;"></span>' +
         '<span class="generation-controls"><a class="stop-generation" href=#>stop generation</a></span>' +
         '<span class="suggest-join" style="display: none;">' +
-          'This speed is slower than expected due to a high load. You can increase Petals capacity by ' +
-          '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">connecting your GPU</a>.' +
+          '<b>Too slow?</b> ' +
+          '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">Connect your GPU</a> ' +
+          'and increase Petals capacity!' +
         '</span>' +
       '</p>'));
     animateLoading();
@@ -148,18 +156,20 @@ function receiveReplica(inputs) {
     const lastReplica = $('.ai-replica .text').last();
     var newText = lastReplica.text() + response.outputs;
     newText = newText.replace(models[curModel].stopToken, "");
-    for (const seq of models[curModel].extraStopSequences) {
-      newText = newText.replace(seq, "");
+    if (models[curModel].extraStopSequences !== null) {
+      for (const seq of models[curModel].extraStopSequences) {
+        newText = newText.replace(seq, "");
+      }
     }
     lastReplica.text(newText);
 
     if (!response.stop && !stop) {
       if (nRequests >= 1) {
-        const stepsPerSecond = totalElapsed / nRequests / 1000;
+        const speed = nRequests / (totalElapsed / 1000);
         $('.speed')
-          .text(`Speed: ${stepsPerSecond.toFixed(1)} sec/token, model: ${models[curModel].name}`)
+          .text(`Speed: ${speed.toFixed(1)} tokens/sec`)
           .show();
-        if (stepsPerSecond >= 3) {
+        if (speed < 0.5) {
           $('.suggest-join').show();
         }
       }
@@ -228,9 +238,6 @@ function resetDialogue() {
     alert("Can't reset the dialogue while the AI is writing a response. Please refresh the page");
     return false;
   }
-  if (!confirm("This will reset the dialogue. Are you sure?")) {
-    return false;
-  }
 
   $('.dialogue').empty();
   appendTextArea();
@@ -250,43 +257,49 @@ function animateLoading() {
 $(() => {
   upgradeTextArea();
 
-  $('.show-few-shot').click(e => {
-    e.preventDefault();
+  $('.model-selector label').click(function (e) {
+    if (!isWaitingForInputs()) {
+      alert("Can't switch the model while the AI is writing a response. Please refresh the page");
+      e.preventDefault();
+      return;
+    }
+
+    curModel = $(`#${$(this).attr("for")}`).attr("value");
+    resetSession();
+
+    $('.model-name')
+      .text($(this).text())
+      .attr('href', models[curModel].modelCard);
+    $('.license-link').attr('href', models[curModel].license);
+    setTimeout(() => $('.human-replica textarea').focus(), 10);
+  });
+  $('.regime-selector label').click(function (e) {
+    if (!resetDialogue()) {
+      e.preventDefault();
+      return;
+    }
+
+    if ($(this).attr("for") === "regime-chatbot") {
+      location.reload();
+      return;
+    }
+
     current_mode = mode.FEW_SHOT;
 
-    if (resetDialogue()) {
-      const textarea = $('.human-replica textarea');
-      textarea.val(
-        'Human: A cat sat on a mat.\n\n' +
-        'AI: Un gato se sentó en una estera.\n\n' +
-        'Human: A brown fox jumps over the lazy dog.\n\n' +
-        'AI: Un zorro marrón salta sobre el perro perezoso.\n\n' +
-        'Human: Who is the president of the United States?'
-      );
-      textarea[0].style.height = textarea[0].scrollHeight + "px";
-      textarea.focus();
-    }
+    const textarea = $('.human-replica textarea');
+    textarea.val(
+      'Human: A cat sat on a mat.\n\n' +
+      'AI: Un gato se sentó en una estera.\n\n' +
+      'Human: A brown fox jumps over the lazy dog.\n\n' +
+      'AI: Un zorro marrón salta sobre el perro perezoso.\n\n' +
+      'Human: Who is the president of the United States?'
+    );
+    textarea[0].style.height = textarea[0].scrollHeight + "px";
+    setTimeout(() => textarea.focus(), 10);
   });
   $('.retry-link').click(e => {
     e.preventDefault();
     retry();
-  });
-  $('.switch-model').click(e => {
-    e.preventDefault();
-    if (!isWaitingForInputs()) {
-      alert("Can't switch the model while the AI is writing a response. Please refresh the page");
-      return false;
-    }
-
-    const prevModel = curModel;
-    curModel = curModel === "bigscience/bloom-petals" ? "bigscience/bloomz-petals" : "bigscience/bloom-petals";
-    resetSession();
-
-    $('.other-model-name').text(models[prevModel].name);
-    $('.model-name')
-      .text(models[curModel].name)
-      .attr('href', models[curModel].href);
-    $('.human-replica textarea').focus();
   });
 
   setInterval(animateLoading, 2000);

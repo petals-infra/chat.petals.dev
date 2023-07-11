@@ -11,9 +11,9 @@
   <body>
 
 <main>
-  <div class="position-relative overflow-hidden px-5 pt-3 m-md-4 text-center">
+  <div class="position-relative overflow-hidden px-5 pt-1 m-md-4 text-center">
     <div class="col-lg-6 col-md-8 p-md-3 mx-auto my-3" style="max-width: 700px;">
-      <div class="mb-5">
+      <div class="mb-4">
         <div class="d-md-inline-block pe-md-4">
           <a target="_blank" href="https://petals.ml"><img src="https://petals.ml/logo.svg" height="100" class="rot-image"></a>
         </div>
@@ -22,27 +22,49 @@
           <span style="font-size: 25pt; color: #aaa;">Chat</span>
         </h1>
       </div>
-      <p class="welcome">
-        <b>Welcome!</b> This chatbot runs
-        <a target="_blank" class="model-name" href="https://huggingface.co/bigscience/bloomz">BLOOMZ-176B</a>
-        over the <a target="_blank" href="https://petals.ml">Petals</a> network.
-        Please do not enter sensitive data and
-        follow the model's <a target="_blank" href="https://huggingface.co/spaces/bigscience/license">terms of use</a>.
-        The chat history is recorded.
-      </p>
+      <div class="welcome mb-4">
+        <div>
+          <b>Welcome!</b> This is a demo app running
+          <a target="_blank" class="model-name" href="https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md">LLaMA-65B</a>
+          over the <a target="_blank" href="https://petals.ml">Petals</a> network.
+          Please follow the model's
+          <a target="_blank" class="license-link" href="https://bit.ly/llama-license">terms of use</a>
+          and do not enter sensitive data.
+          The chat history is recorded.
+        </div>
+        <form id="settings">
+          <div class="mt-2">
+            <label class="group-label">Model:</label>
+            <div class="btn-group model-selector" role="group">
+              <input type="radio" class="btn-check" name="model" value="enoch/llama-65b-hf" id="model-llama-65b-hf" checked>
+              <label class="btn btn-outline-primary" for="model-llama-65b-hf">LLaMA-65B</label>
+              <input type="radio" class="btn-check" name="model" value="bigscience/bloom" id="model-bloom">
+              <label class="btn btn-outline-primary" for="model-bloom">BLOOM</label>
+              <input type="radio" class="btn-check" name="model" value="bigscience/bloomz" id="model-bloomz">
+              <label class="btn btn-outline-primary" for="model-bloomz">BLOOMZ</label>
+            </div>
+          </div>
+          <div class="mt-2">
+            <label class="group-label">Regime:</label>
+            <div class="btn-group regime-selector" role="group">
+              <input type="radio" class="btn-check" name="regime" value="chatbot" id="regime-chatbot" checked>
+              <label class="btn btn-outline-primary" for="regime-chatbot">Chatbot</label>
+              <input type="radio" class="btn-check" name="regime" value="few-shot" id="regime-few-shot">
+              <label class="btn btn-outline-primary" for="regime-few-shot">Few-shot</label>
+            </div>
+          </div>
+        </form>
+      </div>
       <div class="dialogue">
-        <p class="human-replica">A human talks to a powerful AI that follows the human's instructions.</p>
-        <p class="human-replica">Human: Hi!</p>
+        <p class="human-replica">A human talks to a helpful AI that gives intelligent and concise responses.</p>
         <p class="ai-replica"><span class="text">AI: Hi! How can I help you?</span></p>
         <p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">Human: </textarea></p>
       </div>
       <p class="error-box" style="display: none;">Request failed. <a class="retry-link" href="#">Retry</a><br><span class="error-message"></span></p>
 
       <p class="acknowledgements mt-5 pt-3">
-        <a class="switch-model" href="#">Use <span class="other-model-name">regular BLOOM-176B</span></a> |
-        <a class="show-few-shot" href="#">Few-shot mode</a><br>
-        Use <b>Shift+Enter</b> to insert newlines.<br>
-        <br>
+        <!-- <a class="show-few-shot" href="#">Few-shot mode</a><br> -->
+        <b>Shift+Enter</b> inserts newlines.<br>
         See source code and API docs on <a target="_blank" href="https://github.com/borzunov/petals-chat">GitHub</a>.
       </p>
     </div>

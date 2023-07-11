@@ -187,11 +187,44 @@ main p {
 }
 
 .welcome {
-  font-size: 9pt;
   background-color: #fff7f7;
   margin-left: auto;
   margin-right: 0;
-  max-width: 350px;
+  max-width: 370px;
+}
+
+.welcome div, .welcome label, .welcome .dropdown button {
+  font-size: 9pt;
+}
+
+.welcome .group-label {
+  padding-left: 0;
+  padding-right: 5px;
+}
+
+.welcome label {
+  padding: 1px 7px;
+}
+
+.welcome label, .welcome input {
+  box-shadow: none !important;
+}
+
+.welcome .btn-outline-primary, .welcome .btn-outline-primary:hover {
+  color: #333;
+  border-color: black;
+}
+
+.welcome .btn-check:active+.btn-outline-primary, .welcome .btn-check:checked+.btn-outline-primary {
+  color: #fff;
+  background-color: #333;
+  border-color: black;
+}
+
+.welcome .btn-outline-primary:hover {
+  color: black;
+  background-color: #ccc;
+  border-color: black;
 }
 
 .error-box {
