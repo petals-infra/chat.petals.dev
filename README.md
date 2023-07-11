@@ -100,7 +100,9 @@ Response:
 
 ### generate
 
-The next requests must be of type **generate** and include the same parameters as in the [/api/v1/generate HTTP API](#post-apiv1generate), except for `session_id` (it's identified by the connection you use in the WebSocket API).
+The next requests must be of type **generate** and include the same parameters as in the [/api/v1/generate HTTP API](#post-apiv1generate).
+In contrast to HTTP API, you can use this API in streaming fashion, generating a response token-by-token and accepting intermediate prompts from a user
+(e.g., to make a chatbot).
 
 A new feature of the WebSocket API is the `stop_sequence` parameter (str, optional). If you set it, the server will continue generation with the same parameters unless it generates the `stop_sequence`, so you may get multiple responses without having to send the request again and wait for the round trip's latency.
 
@@ -133,7 +135,6 @@ Parameters:
 - **top_p** (float, optional)
 - **max_length** (int) - Max length of generated text (including prefix) in tokens.
 - **max_new_tokens** (int) - Max number of newly generated tokens (excluding prefix).
-- **session_id** (str, optional) - UUID of an inference session opened earlier (see methods below). This allows you to continue generation later without processing prefix from scratch.
 
 Notes:
 
@@ -145,32 +146,4 @@ Returns (JSON):
 
 - **ok** (bool)
 - **outputs** (str)
-- **traceback** (str) - the Python traceback if `ok == False`
-
-### GET /api/v1/open_inference_session
-
-Parameters:
-
-- **max_length** (int, required)
-- **model** (str, optional) - Model name. Default: `config.DEFAULT_MODEL_NAME`.
-
-Notes:
-
-- If you pass the `model` parameter, you must pass it to all calls of `/api/v1/generate` with this session too.
-
-Returns (JSON):
-
-- **ok** (bool)
-- **session_id** (str) - UUID of the opened session
-- **traceback** (str) - the Python traceback if `ok == False`
-
-### GET /api/v1/close_inference_session
-
-Parameters:
-
-- **session_id** (str, required)
-
-Returns (JSON):
-
-- **ok** (bool)
 - **traceback** (str) - the Python traceback if `ok == False`
