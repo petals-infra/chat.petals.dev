@@ -35,11 +35,11 @@ var sessionMaxLength = 1024;
 
 var totalElapsed, nRequests;
 
-const mode = {
+const Regime = {
   CHATBOT: 1,
   FEW_SHOT: 2,
 };
-let current_mode = mode.CHATBOT;
+let curRegime = Regime.CHATBOT;
 let stop = false;
 
 function openSession() {
@@ -79,7 +79,7 @@ function isWaitingForInputs() {
 
 function sendReplica() {
   if (isWaitingForInputs()) {
-    const aiPrompt = (current_mode === mode.CHATBOT) ? 'AI:' : '';
+    const aiPrompt = (curRegime === Regime.CHATBOT) ? 'AI:' : '';
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<p class="ai-replica">' +
@@ -212,7 +212,7 @@ function retry() {
 }
 
 function appendTextArea() {
-  const humanPrompt = (current_mode === mode.CHATBOT) ? "Human: " : "";
+  const humanPrompt = (curRegime === Regime.CHATBOT) ? "Human: " : "";
   $('.dialogue').append($(
     `<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">${humanPrompt}</textarea></p>`
   ));
@@ -231,19 +231,6 @@ function upgradeTextArea() {
       sendReplica();
     }
   });
-}
-
-function resetDialogue() {
-  if (!isWaitingForInputs()) {
-    alert("Can't reset the dialogue while the AI is writing a response. Please refresh the page");
-    return false;
-  }
-
-  $('.dialogue').empty();
-  appendTextArea();
-
-  resetSession();
-  return true;
 }
 
 const animFrames = ["⌛", "🧠"];
@@ -274,17 +261,21 @@ $(() => {
     setTimeout(() => $('.human-replica textarea').focus(), 10);
   });
   $('.regime-selector label').click(function (e) {
-    if (!resetDialogue()) {
+    if (!isWaitingForInputs()) {
+      alert("Can't switch the regime while the AI is writing a response. Please refresh the page");
       e.preventDefault();
       return;
     }
 
+    $('.dialogue').empty();
     if ($(this).attr("for") === "regime-chatbot") {
       location.reload();
       return;
     }
 
-    current_mode = mode.FEW_SHOT;
+    curRegime = Regime.FEW_SHOT;
+    resetSession();
+    appendTextArea();
 
     const textarea = $('.human-replica textarea');
     textarea.val(
