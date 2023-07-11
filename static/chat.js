@@ -25,7 +25,7 @@ var curModel = "enoch/llama-65b-hf";
 
 const generationParams = {
   do_sample: 1,
-  temperature: 0.9,
+  temperature: 0.7,
   top_k: 40,
 };
 
@@ -88,8 +88,9 @@ function sendReplica() {
         '<span class="speed" style="display: none;"></span>' +
         '<span class="generation-controls"><a class="stop-generation" href=#>stop generation</a></span>' +
         '<span class="suggest-join" style="display: none;">' +
-          'This speed is slower than expected due to a high load. You can increase Petals capacity by ' +
-          '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">connecting your GPU</a>.' +
+          '<b>Too slow?</b> ' +
+          '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">Connect your GPU</a> ' +
+          'and increase Petals capacity!' +
         '</span>' +
       '</p>'));
     animateLoading();
@@ -164,11 +165,11 @@ function receiveReplica(inputs) {
 
     if (!response.stop && !stop) {
       if (nRequests >= 1) {
-        const stepsPerSecond = totalElapsed / nRequests / 1000;
+        const speed = nRequests / (totalElapsed / 1000);
         $('.speed')
-          .text(`Speed: ${stepsPerSecond.toFixed(1)} sec/token, model: ${models[curModel].name}`)
+          .text(`Speed: ${speed.toFixed(1)} tokens/sec`)
           .show();
-        if (stepsPerSecond >= 3) {
+        if (speed < 0.5) {
           $('.suggest-join').show();
         }
       }
