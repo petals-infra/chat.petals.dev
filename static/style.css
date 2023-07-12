@@ -99,7 +99,7 @@
 }
 
 main p {
-  font-size: 11pt;
+  font-size: 10pt;
 }
 
 .acknowledgements {
@@ -162,7 +162,7 @@ main p {
   border: none;
   resize: none;
   padding: 0;
-  font-size: 11pt;
+  font-size: 10pt;
 }
 
 .human-replica textarea.form-control:focus {
