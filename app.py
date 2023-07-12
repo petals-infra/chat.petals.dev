@@ -12,30 +12,22 @@ import config
 logger = hivemind.get_logger(__file__)
 
 models = {}
-for model_name in config.MODEL_NAMES:
-    logger.info(f"Loading tokenizer for {model_name}")
-    logger.info(f"Loading model {model_name} with dtype {config.TORCH_DTYPE}")
-    if model_name == "artek0chumak/guanaco-65b":
-        tokenizer = AutoTokenizer.from_pretrained("enoch/llama-65b-hf", add_bos_token=False, use_fast=False)
-        # We set use_fast=False since LlamaTokenizerFast takes a long time to init
-        model = AutoDistributedModelForCausalLM.from_pretrained(
-            "enoch/llama-65b-hf",
-            active_adapter="artek0chumak/guanaco-65b",
-            torch_dtype=config.TORCH_DTYPE,
-            initial_peers=config.INITIAL_PEERS,
-            max_retries=3,
-        )
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(model_name, add_bos_token=False, use_fast=False)
-        # We set use_fast=False since LlamaTokenizerFast takes a long time to init
-        model = AutoDistributedModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype=config.TORCH_DTYPE,
-            initial_peers=config.INITIAL_PEERS,
-            max_retries=3,
-        )
+for model_info in config.MODELS:
+    logger.info(f"Loading tokenizer for {model_info.repo}")
+    tokenizer = AutoTokenizer.from_pretrained(model_info.repo, add_bos_token=False, use_fast=False)
+
+    logger.info(f"Loading model {model_info.repo} with adapter {model_info.adapter} and dtype {config.TORCH_DTYPE}")
+    # We set use_fast=False since LlamaTokenizerFast takes a long time to init
+    model = AutoDistributedModelForCausalLM.from_pretrained(
+        model_info.repo,
+        active_adapter=model_info.adapter,
+        torch_dtype=config.TORCH_DTYPE,
+        initial_peers=config.INITIAL_PEERS,
+        max_retries=3,
+    )
     model = model.to(config.DEVICE)
 
+    model_name = model_info.adapter if model_info.adapter is not None else model_info.repo
     models[model_name] = model, tokenizer
 
 logger.info("Starting Flask app")

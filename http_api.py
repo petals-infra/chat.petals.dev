@@ -5,6 +5,7 @@ from flask import jsonify, request
 
 import config
 from app import app, models
+from utils import safe_decode
 
 logger = hivemind.get_logger(__file__)
 
@@ -29,7 +30,6 @@ def http_api_generate():
             )
 
         model, tokenizer = models[model_name]
-        fake_token = tokenizer("^")["input_ids"][0]  # Workaround to make SentencePiece .decode() keep leading spaces
 
         if inputs is not None:
             inputs = tokenizer(inputs, return_tensors="pt")["input_ids"].to(config.DEVICE)
@@ -46,7 +46,7 @@ def http_api_generate():
             max_length=max_length,
             max_new_tokens=max_new_tokens,
         )
-        outputs = tokenizer.decode([fake_token] + outputs[0, n_input_tokens:].tolist())[1:]
+        outputs = safe_decode(tokenizer, outputs[0, n_input_tokens:])
         logger.info(f"generate(), outputs={repr(outputs)}")
 
         return jsonify(ok=True, outputs=outputs)

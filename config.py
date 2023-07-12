@@ -1,15 +1,29 @@
+from dataclasses import dataclass
+from typing import Optional
+
 import torch
 
 from cpufeature import CPUFeature
 from petals.constants import PUBLIC_INITIAL_PEERS
 
 
+@dataclass
+class ModelInfo:
+    repo: str
+    adapter: Optional[str] = None
+
+
+MODELS = [
+    ModelInfo(repo="enoch/llama-65b-hf"),
+    ModelInfo(repo="enoch/llama-65b-hf", adapter="artek0chumak/guanaco-65b"),
+    ModelInfo(repo="bigscience/bloom"),
+    ModelInfo(repo="bigscience/bloomz"),
+]
+DEFAULT_MODEL_NAME = "bigscience/bloom"
+
 INITIAL_PEERS = PUBLIC_INITIAL_PEERS
 # Set this to a list of multiaddrs to connect to a private swarm instead of the public one, for example:
 # INITIAL_PEERS = ['/ip4/10.1.2.3/tcp/31234/p2p/QmcXhze98AcgGQDDYna23s4Jho96n8wkwLJv78vxtFNq44']
-
-MODEL_NAMES = ["enoch/llama-65b-hf", "artek0chumak/guanaco-65b", "bigscience/bloom", "bigscience/bloomz"]
-DEFAULT_MODEL_NAME = "bigscience/bloom"
 
 DEVICE = "cpu"
 

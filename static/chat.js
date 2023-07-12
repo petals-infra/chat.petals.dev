@@ -1,14 +1,14 @@
 const models = {
-  "enoch/llama-65b-hf": {
-    modelCard: "https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md",
-    license: "https://bit.ly/llama-license",
-    sepToken: "\n\n",
-    stopToken: "\n\n",
-    extraStopSequences: null,
-  },
   "artek0chumak/guanaco-65b": {
     modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
     license: "https://huggingface.co/timdettmers/guanaco-65b",
+    sepToken: "###",
+    stopToken: "###",
+    extraStopSequences: ["</s>"],
+  },
+  "enoch/llama-65b-hf": {
+    modelCard: "https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md",
+    license: "https://bit.ly/llama-license",
     sepToken: "\n\n",
     stopToken: "\n\n",
     extraStopSequences: null,
@@ -28,7 +28,7 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "enoch/llama-65b-hf";
+var curModel = "artek0chumak/guanaco-65b";
 
 const generationParams = {
   do_sample: 1,
@@ -86,7 +86,7 @@ function isWaitingForInputs() {
 
 function sendReplica() {
   if (isWaitingForInputs()) {
-    const aiPrompt = (curRegime === Regime.CHATBOT) ? 'AI:' : '';
+    const aiPrompt = (curRegime === Regime.CHATBOT) ? 'Assistant:' : '';
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<p class="ai-replica">' +
@@ -259,7 +259,9 @@ $(() => {
     }
 
     curModel = $(`#${$(this).attr("for")}`).attr("value");
+    $('.dialogue p').slice(2).remove();
     resetSession();
+    appendTextArea();
 
     $('.model-name')
       .text($(this).text())
@@ -287,9 +289,9 @@ $(() => {
     const textarea = $('.human-replica textarea');
     textarea.val(
       'Human: A cat sat on a mat.\n\n' +
-      'AI: Un gato se sentó en una estera.\n\n' +
+      'Assistant: Un gato se sentó en una estera.\n\n' +
       'Human: A brown fox jumps over the lazy dog.\n\n' +
-      'AI: Un zorro marrón salta sobre el perro perezoso.\n\n' +
+      'Assistant: Un zorro marrón salta sobre el perro perezoso.\n\n' +
       'Human: Who is the president of the United States?'
     );
     textarea[0].style.height = textarea[0].scrollHeight + "px";
