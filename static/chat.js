@@ -6,6 +6,13 @@ const models = {
     stopToken: "\n\n",
     extraStopSequences: null,
   },
+  "artek0chumak/guanaco-65b": {
+    modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
+    license: "https://huggingface.co/timdettmers/guanaco-65b",
+    sepToken: "\n\n",
+    stopToken: "\n\n",
+    extraStopSequences: null,
+  },
   "bigscience/bloom": {
     modelCard: "https://huggingface.co/bigscience/bloom",
     license: "https://bit.ly/bloom-license",

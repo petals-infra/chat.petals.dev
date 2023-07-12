@@ -18,12 +18,21 @@ for model_name in config.MODEL_NAMES:
     # We set use_fast=False since LlamaTokenizerFast takes a long time to init
 
     logger.info(f"Loading model {model_name} with dtype {config.TORCH_DTYPE}")
-    model = AutoDistributedModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=config.TORCH_DTYPE,
-        initial_peers=config.INITIAL_PEERS,
-        max_retries=3,
-    )
+    if model_name == "artek0chumak/guanaco-65b":
+        model = AutoDistributedModelForCausalLM.from_pretrained(
+            "enoch/llama-65b-hf",
+            active_adapter="artek0chumak/guanaco-65b",
+            torch_dtype=config.TORCH_DTYPE,
+            initial_peers=config.INITIAL_PEERS,
+            max_retries=3,
+        )
+    else:
+        model = AutoDistributedModelForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=config.TORCH_DTYPE,
+            initial_peers=config.INITIAL_PEERS,
+            max_retries=3,
+        )
     model = model.to(config.DEVICE)
 
     models[model_name] = model, tokenizer
