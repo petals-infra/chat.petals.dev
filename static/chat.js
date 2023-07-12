@@ -259,7 +259,11 @@ $(() => {
     }
 
     curModel = $(`#${$(this).attr("for")}`).attr("value");
-    $('.dialogue p').slice(2).remove();
+    if (curRegime === Regime.CHATBOT) {
+      $('.dialogue p').slice(2).remove();
+    } else {
+      $('.dialogue').empty();
+    }
     resetSession();
     appendTextArea();
 
@@ -288,11 +292,11 @@ $(() => {
 
     const textarea = $('.human-replica textarea');
     textarea.val(
-      'Human: A cat sat on a mat.\n\n' +
-      'Assistant: Un gato se sentó en una estera.\n\n' +
-      'Human: A brown fox jumps over the lazy dog.\n\n' +
-      'Assistant: Un zorro marrón salta sobre el perro perezoso.\n\n' +
-      'Human: Who is the president of the United States?'
+      'Input: A cat sat on a mat.\n\n' +
+      'Output: Un gato se sentó en una estera.\n\n' +
+      'Input: A brown fox jumps over the lazy dog.\n\n' +
+      'Output: Un zorro marrón salta sobre el perro perezoso.\n\n' +
+      'Input: Who is the president of the United States?'
     );
     textarea[0].style.height = textarea[0].scrollHeight + "px";
     setTimeout(() => textarea.focus(), 10);
