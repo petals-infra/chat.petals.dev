@@ -1,5 +1,5 @@
 const models = {
-  "artek0chumak/guanaco-65b": {
+  "timdettmers/guanaco-65b": {
     modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
     license: "https://huggingface.co/timdettmers/guanaco-65b",
     sepToken: "###",
@@ -28,7 +28,7 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "artek0chumak/guanaco-65b";
+var curModel = "timdettmers/guanaco-65b";
 
 const generationParams = {
   do_sample: 1,
