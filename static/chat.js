@@ -38,7 +38,7 @@ const generationParams = {
 
 var ws = null;
 var position = 0;
-var sessionMaxLength = 1024;
+var sessionMaxLength = 512;
 
 var totalElapsed, nRequests;
 
