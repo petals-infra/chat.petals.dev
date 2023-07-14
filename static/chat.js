@@ -9,9 +9,9 @@ const models = {
   "enoch/llama-65b-hf": {
     modelCard: "https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md",
     license: "https://bit.ly/llama-license",
-    sepToken: "\n\n",
-    stopToken: "\n\n",
-    extraStopSequences: null,
+    sepToken: "###",
+    stopToken: "###",
+    extraStopSequences: ["</s>"],
   },
   "bigscience/bloom": {
     modelCard: "https://huggingface.co/bigscience/bloom",
