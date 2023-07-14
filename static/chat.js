@@ -67,7 +67,7 @@ function openSession() {
   ws.onerror = _event => handleFailure(`Connection failed`);
   ws.onclose = _event => {
     if ($(".error-box").is(":hidden")) {
-      handleFailure(`Connection was closed`);
+      handleFailure(`Connection was closed`, true);
     }
   };
 }
@@ -189,11 +189,10 @@ function receiveReplica(inputs) {
   };
 }
 
-function handleFailure(message) {
+function handleFailure(message, autoRetry = false) {
   resetSession();
   if (!isWaitingForInputs()) {
     // Show the error and the retry button only if a user is waiting for the generation results
-    var autoRetry = false;
     if (/Session .+ expired/.test(message)) {
       autoRetry = true;
     }
