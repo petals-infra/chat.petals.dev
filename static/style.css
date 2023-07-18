@@ -193,6 +193,12 @@ main p {
   max-width: 400px;
 }
 
+@media (max-width: 767px) {
+  .welcome {
+    width: 100%;
+  }
+}
+
 .welcome div, .welcome label, .welcome .dropdown button {
   font-size: 9pt;
 }
