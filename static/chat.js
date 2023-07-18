@@ -2,6 +2,7 @@ const models = {
   "timdettmers/guanaco-65b": {
     modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
     license: "https://huggingface.co/timdettmers/guanaco-65b",
+    researchOnly: true,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
@@ -9,6 +10,7 @@ const models = {
   "enoch/llama-65b-hf": {
     modelCard: "https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md",
     license: "https://bit.ly/llama-license",
+    researchOnly: true,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
@@ -16,6 +18,7 @@ const models = {
   "bigscience/bloom": {
     modelCard: "https://huggingface.co/bigscience/bloom",
     license: "https://bit.ly/bloom-license",
+    researchOnly: false,
     sepToken: "\n\n",
     stopToken: "\n\n",
     extraStopSequences: null,
@@ -23,6 +26,7 @@ const models = {
   "bigscience/bloomz": {
     modelCard: "https://huggingface.co/bigscience/bloomz",
     license: "https://bit.ly/bloom-license",
+    researchOnly: false,
     sepToken: "\n\n",
     stopToken: "</s>",
     extraStopSequences: ["\n\nHuman"],
@@ -269,6 +273,7 @@ $(() => {
     $('.model-name')
       .text($(this).text())
       .attr('href', models[curModel].modelCard);
+    $('.research-only').toggle(models[curModel].researchOnly);
     $('.license-link').attr('href', models[curModel].license);
     setTimeout(() => $('.human-replica textarea').focus(), 10);
   });
