@@ -210,7 +210,13 @@ function handleFailure(message, autoRetry = false) {
       retry();
     } else {
       $('.loading-animation').hide();
-      $('.error-message').text(message);
+      if (/attention cache is full/.test(message)) {
+        $('.error-message').hide();
+        $('.out-of-capacity').show();
+      } else {
+        $('.out-of-capacity').hide();
+        $('.error-message').text(message).show();
+      }
       $('.error-box').show();
     }
   }

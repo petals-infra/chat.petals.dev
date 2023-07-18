@@ -140,9 +140,10 @@ main p {
   width: 90%;
   max-width: 360px;
   text-align: left;
+  word-wrap: break-word;
 }
 
-.human-replica, .ai-replica, .error-box {
+.human-replica, .ai-replica, .error-message {
   white-space: pre-wrap;
 }
 
@@ -245,6 +246,10 @@ main p {
 .error-message {
   font-family: monospace;
   font-size: 8pt;
+}
+
+.out-of-capacity {
+  font-size: 9pt;
 }
 
 .reset-btn {
