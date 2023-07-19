@@ -24,7 +24,7 @@ const models = {
     extraStopSequences: ["</s>"],
   },
   "enoch/llama-65b-hf": {
-    modelCard: "https://github.com/facebookresearch/llama/blob/main/MODEL_CARD.md",
+    modelCard: "https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
     license: "https://bit.ly/llama-license",
     researchOnly: true,
     sepToken: "###",
