@@ -52,8 +52,8 @@ var curModel = "meta-llama/Llama-2-70b-chat-hf";
 
 const generationParams = {
   do_sample: 1,
-  temperature: 0.7,
-  top_k: 40,
+  temperature: 0.9,
+  top_p: 0.6,
 };
 
 var ws = null;
