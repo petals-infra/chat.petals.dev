@@ -1,4 +1,20 @@
 const models = {
+  "meta-llama/Llama-2-70b-chat-hf": {
+    modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
+    license: "https://bit.ly/llama2-license",
+    researchOnly: false,
+    sepToken: "###",
+    stopToken: "###",
+    extraStopSequences: ["</s>"],
+  },
+  "meta-llama/Llama-2-70b-hf": {
+    modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-hf",
+    license: "https://bit.ly/llama2-license",
+    researchOnly: false,
+    sepToken: "###",
+    stopToken: "###",
+    extraStopSequences: ["</s>"],
+  },
   "timdettmers/guanaco-65b": {
     modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
     license: "https://huggingface.co/timdettmers/guanaco-65b",
@@ -32,7 +48,7 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "timdettmers/guanaco-65b";
+var curModel = "meta-llama/Llama-2-70b-chat-hf";
 
 const generationParams = {
   do_sample: 1,
@@ -260,6 +276,25 @@ function animateLoading() {
 $(() => {
   upgradeTextArea();
 
+  $('.family-selector label').click(function (e) {
+    if (!isWaitingForInputs()) {
+      alert("Can't switch the model while the AI is writing a response. Please refresh the page");
+      e.preventDefault();
+      return;
+    }
+
+    const radio = $(`#${$(this).attr("for")}`);
+    if (radio.is(":checked")) {
+      setTimeout(() => $('.human-replica textarea').focus(), 10);
+      return;
+    }
+
+    const curFamily = radio.attr("value");
+    $('.model-selector').hide();
+    const firstLabel = $(`.model-selector[data-family=${curFamily}]`).show().children('label:first');
+    firstLabel.click();
+    firstLabel.trigger('click');
+  });
   $('.model-selector label').click(function (e) {
     if (!isWaitingForInputs()) {
       alert("Can't switch the model while the AI is writing a response. Please refresh the page");
@@ -282,34 +317,6 @@ $(() => {
     $('.research-only').toggle(models[curModel].researchOnly);
     $('.license-link').attr('href', models[curModel].license);
     setTimeout(() => $('.human-replica textarea').focus(), 10);
-  });
-  $('.regime-selector label').click(function (e) {
-    if (!isWaitingForInputs()) {
-      alert("Can't switch the regime while the AI is writing a response. Please refresh the page");
-      e.preventDefault();
-      return;
-    }
-
-    $('.dialogue').empty();
-    if ($(this).attr("for") === "regime-chatbot") {
-      location.reload();
-      return;
-    }
-
-    curRegime = Regime.FEW_SHOT;
-    resetSession();
-    appendTextArea();
-
-    const textarea = $('.human-replica textarea');
-    textarea.val(
-      'Input: A cat sat on a mat.\n\n' +
-      'Output: Un gato se sentó en una estera.\n\n' +
-      'Input: A brown fox jumps over the lazy dog.\n\n' +
-      'Output: Un zorro marrón salta sobre el perro perezoso.\n\n' +
-      'Input: Who is the president of the United States?'
-    );
-    textarea[0].style.height = textarea[0].scrollHeight + "px";
-    setTimeout(() => textarea.focus(), 10);
   });
   $('.retry-link').click(e => {
     e.preventDefault();

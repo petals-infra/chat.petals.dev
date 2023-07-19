@@ -52,12 +52,10 @@ If you develop your own web app, you can use our endpoint at `http://chat.petals
 
 - You don't have to serve all models. If you don't have enough memory, remove some models in [config.py](config.py).
 
-| Model | Embeds in 16-bit | Embeds in 32-bit |
+| Model family | Embeds in 16-bit | Embeds in 32-bit |
 | --- | --- | --- |
-| LLaMA-65B | 1.05 GB | 2.1 GB |
-| Guanaco-65B | 1.05 GB | 2.1 GB |
-| BLOOM-176B | 7.19 GB | 14.38 GB |
-| BLOOMZ-176B | 7.19 GB | 14.38 GB |
+| LLaMA 2 (70B, 70B-Chat), LLaMA-65B, Guanaco-65B | 1.05 GB | 2.1 GB |
+| BLOOM-176B, BLOOMZ-176B | 7.19 GB | 14.38 GB |
 
 ## WebSocket API (`/api/v2/generate`)
 
