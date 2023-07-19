@@ -20,7 +20,7 @@ flask run --host=0.0.0.0 --port=5000
 In production, we recommend using gunicorn instead of the Flask dev server:
 
 ```bash
-gunicorn app:app --bind 0.0.0.0:5000 --threads 100 --timeout 1000
+gunicorn app:app --bind 0.0.0.0:5000 --worker-class gthread --threads 100 --timeout 1000
 ```
 
 The chat uses the WebSocket API under the hood.
@@ -55,6 +55,7 @@ If you develop your own web app, you can use our endpoint at `http://chat.petals
 | Model | Embeds in 16-bit | Embeds in 32-bit |
 | --- | --- | --- |
 | LLaMA-65B | 1.05 GB | 2.1 GB |
+| Guanaco-65B | 1.05 GB | 2.1 GB |
 | BLOOM-176B | 7.19 GB | 14.38 GB |
 | BLOOMZ-176B | 7.19 GB | 14.38 GB |
 
