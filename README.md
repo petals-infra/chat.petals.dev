@@ -63,7 +63,7 @@ This API implies that you open a WebSocket connection and exchange JSON-encoded 
 This may be done from any programming language, see the example on Javascript:
 
 ```javascript
-const ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
+const ws = new WebSocket(`wss://chat.petals.dev/api/v2/generate`);
 ws.onopen = () => {
     ws.send(JSON.stringify({type: "open_inference_session", max_length: 1024}));
     ws.onmessage = event => {

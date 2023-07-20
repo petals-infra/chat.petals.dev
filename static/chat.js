@@ -70,7 +70,7 @@ let curRegime = Regime.CHATBOT;
 let stop = false;
 
 function openSession() {
-  ws = new WebSocket(`ws://${location.host}/api/v2/generate`);
+  ws = new WebSocket(`wss://${location.host}/api/v2/generate`);
   ws.onopen = () => {
     ws.send(JSON.stringify({type: "open_inference_session", model: curModel, max_length: sessionMaxLength}));
     ws.onmessage = event => {
