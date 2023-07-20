@@ -11,7 +11,7 @@ A chatbot [web app](https://chat.petals.dev) + HTTP and WebSocket endpoints for 
 You can try it out [here](https://chat.petals.dev) or run the backend on your server using these commands:
 
 ```bash
-git clone https://github.com/borzunov/chat.petals.ml.git
+git clone https://github.com/petals-infra/chat.petals.dev.git
 cd chat.petals.ml
 pip install -r requirements.txt
 flask run --host=0.0.0.0 --port=5000
