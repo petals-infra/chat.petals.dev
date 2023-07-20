@@ -1,6 +1,6 @@
 # Petals Chat
 
-A chatbot [web app](http://chat.petals.ml) + HTTP and WebSocket endpoints for LLM inference with the [Petals](https://petals.ml) client
+A chatbot [web app](https://chat.petals.dev) + HTTP and WebSocket endpoints for LLM inference with the [Petals](https://petals.dev) client
 
 ## Interactive Chat
 
@@ -8,7 +8,7 @@ A chatbot [web app](http://chat.petals.ml) + HTTP and WebSocket endpoints for LL
 <img src="https://i.imgur.com/QVTzc6u.png" width="600px">
 </div>
 
-You can try it out [here](http://chat.petals.ml) or run the backend on your server using these commands:
+You can try it out [here](https://chat.petals.dev) or run the backend on your server using these commands:
 
 ```bash
 git clone https://github.com/borzunov/chat.petals.ml.git
@@ -34,9 +34,9 @@ The backend provides two APIs endpoints:
 
 Please use the WebSocket API when possible - it is much faster, more powerful, and consumes less resources.
 
-If you develop your own web app, you can use our endpoint at `http://chat.petals.ml/api/...` for research and development, then set up your own backend for production using the commands above.
+If you develop your own web app, you can use our endpoint at `https://chat.petals.dev/api/...` for research and development, then set up your own backend for production using the commands above.
 
-> **Note:** We do not recommend using the endpoint at `http://chat.petals.ml/api/...` in production. It has a limited throughput, and we may pause or stop it any time.
+> **Note:** We do not recommend using the endpoint at `https://chat.petals.dev/api/...` in production. It has a limited throughput, and we may pause or stop it any time.
 
 ### Backend's system requirements
 
