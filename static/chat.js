@@ -2,7 +2,7 @@ const models = {
   "meta-llama/Llama-2-70b-chat-hf": {
     modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
     license: "https://bit.ly/llama2-license",
-    researchOnly: false,
+    maxSessionLength: 8192,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
@@ -10,7 +10,7 @@ const models = {
   "meta-llama/Llama-2-70b-hf": {
     modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-hf",
     license: "https://bit.ly/llama2-license",
-    researchOnly: false,
+    maxSessionLength: 8192,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
@@ -18,7 +18,7 @@ const models = {
   "timdettmers/guanaco-65b": {
     modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
     license: "https://huggingface.co/timdettmers/guanaco-65b",
-    researchOnly: true,
+    maxSessionLength: 2048,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
@@ -26,7 +26,7 @@ const models = {
   "enoch/llama-65b-hf": {
     modelCard: "https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
     license: "https://bit.ly/llama-license",
-    researchOnly: true,
+    maxSessionLength: 2048,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
@@ -34,7 +34,7 @@ const models = {
   "bigscience/bloom": {
     modelCard: "https://huggingface.co/bigscience/bloom",
     license: "https://bit.ly/bloom-license",
-    researchOnly: false,
+    maxSessionLength: 2048,
     sepToken: "\n\n",
     stopToken: "\n\n",
     extraStopSequences: null,
@@ -42,7 +42,7 @@ const models = {
   "bigscience/bloomz": {
     modelCard: "https://huggingface.co/bigscience/bloomz",
     license: "https://bit.ly/bloom-license",
-    researchOnly: false,
+    maxSessionLength: 2048,
     sepToken: "\n\n",
     stopToken: "</s>",
     extraStopSequences: ["\n\nHuman"],
@@ -58,7 +58,8 @@ const generationParams = {
 
 var ws = null;
 var position = 0;
-var sessionMaxLength = 512;
+var sessionLength = null;
+var connFailureBefore = false;
 
 var totalElapsed, nRequests;
 
@@ -70,9 +71,13 @@ let curRegime = Regime.CHATBOT;
 let stop = false;
 
 function openSession() {
-  ws = new WebSocket(`wss://${location.host}/api/v2/generate`);
+  let protocol = location.protocol == "https:" ? "wss:" : "ws:";
+  ws = new WebSocket(`${protocol}//${location.host}/api/v2/generate`);
   ws.onopen = () => {
-    ws.send(JSON.stringify({type: "open_inference_session", model: curModel, max_length: sessionMaxLength}));
+    if (sessionLength === null) {
+      sessionLength = 512;
+    }
+    ws.send(JSON.stringify({type: "open_inference_session", model: curModel, max_length: sessionLength}));
     ws.onmessage = event => {
       const response = JSON.parse(event.data);
       if (!response.ok) {
@@ -98,6 +103,7 @@ function resetSession() {
   }
   ws = null;
   position = 0;
+  sessionLength = null;
 }
 
 function isWaitingForInputs() {
@@ -168,6 +174,8 @@ function receiveReplica(inputs) {
 
   var lastMessageTime = null;
   ws.onmessage = event => {
+    connFailureBefore = false;  // We've managed to connect after a possible failure
+
     const response = JSON.parse(event.data);
     if (!response.ok) {
       handleFailure(response.traceback);
@@ -213,12 +221,17 @@ function handleFailure(message, autoRetry = false) {
   resetSession();
   if (!isWaitingForInputs()) {
     // Show the error and the retry button only if a user is waiting for the generation results
+
+    if (message === "Connection failed" && !connFailureBefore) {
+      autoRetry = true;
+      connFailureBefore = true;
+    }
     if (/Session .+ expired/.test(message)) {
       autoRetry = true;
     }
-    const largerMaxLength = 2048;
-    if (/Maximum length exceeded/.test(message) && sessionMaxLength < largerMaxLength) {
-      sessionMaxLength = largerMaxLength;  // We gradually increase sessionMaxLength to save server resources
+    if (/Maximum length exceeded/.test(message) && sessionLength < models[curModel].maxSessionLength) {
+      // We gradually increase sessionLength to save server resources. Default: 512 -> 2048 -> 8192 (if supported)
+      sessionLength = Math.min(sessionLength * 4, models[curModel].maxSessionLength);
       autoRetry = true;
     }
 
@@ -314,7 +327,6 @@ $(() => {
     $('.model-name')
       .text($(this).text())
       .attr('href', models[curModel].modelCard);
-    $('.research-only').toggle(models[curModel].researchOnly);
     $('.license-link').attr('href', models[curModel].license);
     setTimeout(() => $('.human-replica textarea').focus(), 10);
   });
