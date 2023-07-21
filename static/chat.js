@@ -58,7 +58,8 @@ const generationParams = {
 
 var ws = null;
 var position = 0;
-var sessionLength = null;
+const initialSessionLength = 512;
+var sessionLength = initialSessionLength;
 var connFailureBefore = false;
 
 var totalElapsed, nRequests;
@@ -74,9 +75,6 @@ function openSession() {
   let protocol = location.protocol == "https:" ? "wss:" : "ws:";
   ws = new WebSocket(`${protocol}//${location.host}/api/v2/generate`);
   ws.onopen = () => {
-    if (sessionLength === null) {
-      sessionLength = 512;
-    }
     ws.send(JSON.stringify({type: "open_inference_session", model: curModel, max_length: sessionLength}));
     ws.onmessage = event => {
       const response = JSON.parse(event.data);
@@ -103,7 +101,6 @@ function resetSession() {
   }
   ws = null;
   position = 0;
-  sessionLength = null;
 }
 
 function isWaitingForInputs() {
@@ -321,6 +318,8 @@ $(() => {
     } else {
       $('.dialogue').empty();
     }
+
+    sessionLength = initialSessionLength;
     resetSession();
     appendTextArea();
 
