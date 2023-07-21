@@ -12,7 +12,7 @@ You can try it out [here](https://chat.petals.dev) or run the backend on your se
 
 ```bash
 git clone https://github.com/petals-infra/chat.petals.dev.git
-cd chat.petals.ml
+cd chat.petals.dev
 pip install -r requirements.txt
 flask run --host=0.0.0.0 --port=5000
 ```
