@@ -71,7 +71,7 @@ def ws_api_generate(ws):
                             if combined.endswith(seq):
                                 stop = True
                                 session.last_token_id = cont_token
-                    if not stop and outputs.find(u'\ufffd') > -1:
+                    if not stop and outputs[-10:].find(u'\ufffd') > -1:
                         # If there's a replacement character, keep getting more tokens
                         # until we can decode properly
                         delta_q = delta_q + delta
