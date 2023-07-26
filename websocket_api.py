@@ -47,7 +47,6 @@ def ws_api_generate(ws):
                         "extra_stop_sequences require stop_sequence length to be exactly 1 token"
 
                 all_outputs = ''
-                
                 delta_q = []
                 stop = False
                 while not stop:
@@ -65,21 +64,21 @@ def ws_api_generate(ws):
                     outputs = safe_decode(tokenizer, torch.Tensor(delta_q + delta))
                     inputs = None  # Inputs are passed only for the 1st token of the bot's response
                     n_input_tokens = 0 
-                    if outputs.find(u'\ufffd') > -1 and len(delta_q) < 50:
+                    combined = all_outputs + outputs
+                    stop = stop_sequence is None or combined.endswith(stop_sequence)
+                    if extra_stop_sequences is not None:
+                        for seq in extra_stop_sequences:
+                            if combined.endswith(seq):
+                                stop = True
+                                session.last_token_id = cont_token
+                    if outputs.find(u'\ufffd') > -1:
                         # If there's a replacement character, keep getting more tokens
                         # until we can decode properly
                         delta_q = delta_q + delta
-                        logger.info(f"ws.generate.step(), get next: all_outputs={repr(all_outputs + outputs)}, stop={stop}")
+                        logger.info(f"ws.generate.step(), get next: all_outputs={repr(combined)}, stop={stop}")
                     else:
                         all_outputs += outputs
                         delta_q = []
-                        stop = stop_sequence is None or all_outputs.endswith(stop_sequence)
-                        if extra_stop_sequences is not None:
-                            for seq in extra_stop_sequences:
-                                if all_outputs.endswith(seq):
-                                    stop = True
-                                    session.last_token_id = cont_token
-
                         logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
                         ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop}))
     except flask_sock.ConnectionClosed:
