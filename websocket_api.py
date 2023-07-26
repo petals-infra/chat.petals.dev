@@ -75,9 +75,9 @@ def ws_api_generate(ws):
                         # If there's a replacement character, keep getting more tokens
                         # until we can decode properly
                         delta_q = delta_q + delta
-                        logger.info(f"ws.generate.step(), get next: all_outputs={repr(combined)}, stop={stop}")
+                        logger.info(f"ws.generate.append_retry(), all_outputs={repr(combined)}")
                     else:
-                        all_outputs += outputs
+                        all_outputs = combined
                         delta_q = []
                         logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
                         ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop}))
