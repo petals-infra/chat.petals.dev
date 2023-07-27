@@ -48,8 +48,10 @@ def ws_api_generate(ws):
 
                 all_outputs = ''
                 delta_q = []
+                steps=0
                 stop = False
                 while not stop:
+                    steps += 1
                     outputs = model.generate(
                         inputs=inputs,
                         do_sample=request.get("do_sample", False),
@@ -80,7 +82,7 @@ def ws_api_generate(ws):
                         all_outputs = combined
                         delta_q = []
                         logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
-                        ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop}))
+                        ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "steps": steps}))
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
