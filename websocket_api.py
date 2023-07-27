@@ -80,10 +80,11 @@ def ws_api_generate(ws):
                         logger.info(f"ws.generate.append_retry(), all_outputs={repr(combined)}")
                     else:
                         all_outputs = combined
-                        token_count = len([delta_q + delta])
+                        token_count = len(delta_q + delta)
                         delta_q = []
                         logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
                         ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "steps": steps, "token_count": token_count}))
+                        steps=0
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
