@@ -183,7 +183,7 @@ function receiveReplica(inputs) {
     if (lastMessageTime != null) {
       totalElapsed += performance.now() - lastMessageTime;
       tokenCount += response.token_count;
-      nRequests ++;
+      nRequests++;
     }
     lastMessageTime = performance.now();
 

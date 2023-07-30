@@ -48,7 +48,7 @@ def ws_api_generate(ws):
 
                 all_outputs = ''
                 delta_q = []
-                steps=0
+                steps = 0
                 stop = False
                 while not stop:
                     steps += 1
@@ -84,7 +84,7 @@ def ws_api_generate(ws):
                         delta_q = []
                         logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
                         ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "steps": steps, "token_count": token_count}))
-                        steps=0
+                        steps = 0
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
