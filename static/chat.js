@@ -54,7 +54,7 @@ const initialSessionLength = 512;
 var sessionLength = initialSessionLength;
 var connFailureBefore = false;
 
-var totalElapsed, nRequests;
+var totalElapsed, tokenCount;
 
 const Regime = {
   CHATBOT: 1,
@@ -147,7 +147,7 @@ function sendReplica() {
   position = replicaDivs.length;
 
   totalElapsed = 0;
-  nRequests = 0;
+  tokenCount = 0;
   receiveReplica(inputs);
 }
 
@@ -173,7 +173,7 @@ function receiveReplica(inputs) {
 
     if (lastMessageTime != null) {
       totalElapsed += performance.now() - lastMessageTime;
-      nRequests++;
+      tokenCount += response.token_count;
     }
     lastMessageTime = performance.now();
 
@@ -188,8 +188,8 @@ function receiveReplica(inputs) {
     lastReplica.text(newText);
 
     if (!response.stop && !stop) {
-      if (nRequests >= 1) {
-        const speed = nRequests / (totalElapsed / 1000);
+      if (tokenCount >= 1) {
+        const speed = tokenCount / (totalElapsed / 1000);
         $('.speed')
           .text(`Speed: ${speed.toFixed(1)} tokens/sec`)
           .show();
