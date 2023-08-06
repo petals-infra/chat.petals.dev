@@ -8,7 +8,7 @@ A chatbot [web app](https://chat.petals.dev) + HTTP and WebSocket endpoints for 
 <img src="https://i.imgur.com/QVTzc6u.png" width="600px">
 </div>
 
-You can try it out [here](https://chat.petals.dev) or run the backend on your server using these commands:
+You can try it out at **https://chat.petals.dev** or run the backend on your server using these commands:
 
 ```bash
 git clone https://github.com/petals-infra/chat.petals.dev.git
@@ -17,7 +17,9 @@ pip install -r requirements.txt
 flask run --host=0.0.0.0 --port=5000
 ```
 
-In production, we recommend using gunicorn instead of the Flask dev server:
+🦙 **Want to serve LLaMA 2?** Request access to its weights at the ♾️ [Meta AI website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and 🤗 [Model Hub](https://huggingface.co/meta-llama/Llama-2-70b-hf), then run `huggingface-cli login` in the terminal before starting the web app. If you don't want LLaMA 2, just remove the `meta-llama` repositories from [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py#L17).
+
+🦄 **Deploying with Gunicorn.** In production, we recommend using gunicorn instead of the Flask dev server:
 
 ```bash
 gunicorn app:app --bind 0.0.0.0:5000 --worker-class gthread --threads 100 --timeout 1000

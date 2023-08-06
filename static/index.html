@@ -35,10 +35,10 @@
       <div class="welcome mb-4">
         <div>
           <b>Welcome!</b> This is a demo app running
-          <a target="_blank" class="model-name" href="https://huggingface.co/meta-llama/Llama-2-70b-chat-hf">LLaMA 2 (70B-chat)</a>
+          <a target="_blank" class="model-name" href="https://huggingface.co/stabilityai/StableBeluga2">Stable Beluga 2 (70B)</a>
           over the <a target="_blank" href="https://petals.dev">Petals</a> network.
           Please follow the model's
-          <a target="_blank" class="license-link" href="https://bit.ly/llama2-license">terms of use</a>
+          <a target="_blank" class="license-link" href="https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt">terms of use</a>
           and do not enter sensitive data.
           The chat history is recorded.
         </div>
@@ -57,10 +57,10 @@
           <div class="mt-2">
             <label class="group-label">Model:</label>
             <div class="model-selector btn-group" role="group" data-family="llama-2">
-              <input type="radio" class="btn-check" name="model" value="meta-llama/Llama-2-70b-chat-hf" id="meta-llama-2-70b-chat-hf" checked>
+              <input type="radio" class="btn-check" name="model" value="stabilityai/StableBeluga2" id="stablebeluga2" checked>
+              <label class="btn btn-outline-primary" for="stablebeluga2">Stable Beluga 2 (70B)</label>
+              <input type="radio" class="btn-check" name="model" value="meta-llama/Llama-2-70b-chat-hf" id="meta-llama-2-70b-chat-hf">
               <label class="btn btn-outline-primary" for="meta-llama-2-70b-chat-hf">LLaMA 2 (70B-chat)</label>
-              <input type="radio" class="btn-check" name="model" value="meta-llama/Llama-2-70b-hf" id="meta-llama-2-70b-hf">
-              <label class="btn btn-outline-primary" for="meta-llama-2-70b-hf">LLaMA 2 (70B)</label>
             </div>
             <div class="model-selector btn-group" role="group" data-family="llama" style="display: none;">
               <input type="radio" class="btn-check" name="model" value="timdettmers/guanaco-65b" id="model-guanaco-65b">
@@ -103,6 +103,6 @@
 </main>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="./static/autosize.min.js"></script>
-    <script src="./static/chat.js"></script>
+    <script src="./static/chat.js?v=1"></script>
   </body>
 </html>

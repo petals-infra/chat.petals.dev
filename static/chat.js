@@ -1,14 +1,14 @@
 const models = {
-  "meta-llama/Llama-2-70b-chat-hf": {
-    modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
-    license: "https://bit.ly/llama2-license",
+  "stabilityai/StableBeluga2": {
+    modelCard: "https://huggingface.co/stabilityai/StableBeluga2",
+    license: "https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt",
     maxSessionLength: 8192,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],
   },
-  "meta-llama/Llama-2-70b-hf": {
-    modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-hf",
+  "meta-llama/Llama-2-70b-chat-hf": {
+    modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
     license: "https://bit.ly/llama2-license",
     maxSessionLength: 8192,
     sepToken: "###",
@@ -31,14 +31,6 @@ const models = {
     stopToken: "###",
     extraStopSequences: ["</s>"],
   },
-  "bigscience/bloom": {
-    modelCard: "https://huggingface.co/bigscience/bloom",
-    license: "https://bit.ly/bloom-license",
-    maxSessionLength: 2048,
-    sepToken: "\n\n",
-    stopToken: "\n\n",
-    extraStopSequences: null,
-  },
   "bigscience/bloomz": {
     modelCard: "https://huggingface.co/bigscience/bloomz",
     license: "https://bit.ly/bloom-license",
@@ -48,7 +40,7 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "meta-llama/Llama-2-70b-chat-hf";
+var curModel = "stabilityai/StableBeluga2";
 
 const generationParams = {
   do_sample: 1,
