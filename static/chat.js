@@ -193,7 +193,7 @@ function receiveReplica(inputs) {
         $('.speed')
           .text(`Speed: ${speed.toFixed(1)} tokens/sec`)
           .show();
-        if (speed < 0.5) {
+        if (speed < 1) {
           $('.suggest-join').show();
         }
       }
