@@ -61,9 +61,9 @@ def ws_api_generate(ws):
                         session=session,
                     )
                     delta = outputs[0, n_input_tokens:].tolist()
-                    outputs = safe_decode(tokenizer, torch.Tensor(delta_q + delta))
+                    outputs = safe_decode(tokenizer, delta_q + delta)
                     inputs = None  # Inputs are passed only for the 1st token of the bot's response
-                    n_input_tokens = 0 
+                    n_input_tokens = 0
                     combined = all_outputs + outputs
                     stop = stop_sequence is None or combined.endswith(stop_sequence)
                     if extra_stop_sequences is not None:
