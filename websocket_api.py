@@ -53,9 +53,10 @@ def ws_api_generate(ws):
                     outputs = model.generate(
                         inputs=inputs,
                         do_sample=request.get("do_sample", False),
-                        temperature=request.get("temperature", 1.0),
+                        temperature=request.get("temperature"),
                         top_k=request.get("top_k"),
                         top_p=request.get("top_p"),
+                        repetition_penalty=request.get("repetition_penalty"),
                         max_length=request.get("max_length"),
                         max_new_tokens=request.get("max_new_tokens"),
                         session=session,

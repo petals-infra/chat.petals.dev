@@ -15,10 +15,11 @@ def http_api_generate():
     try:
         model_name = get_typed_arg("model", str, config.DEFAULT_MODEL_NAME)
         inputs = request.values.get("inputs")
-        do_sample = get_typed_arg("do_sample", int, 0)
-        temperature = get_typed_arg("temperature", float, 1.0)
+        do_sample = get_typed_arg("do_sample", int, False)
+        temperature = get_typed_arg("temperature", float)
         top_k = get_typed_arg("top_k", int)
         top_p = get_typed_arg("top_p", float)
+        repetition_penalty = get_typed_arg("repetition_penalty", float)
         max_length = get_typed_arg("max_length", int)
         max_new_tokens = get_typed_arg("max_new_tokens", int)
         session_id = request.values.get("session_id")
@@ -43,6 +44,7 @@ def http_api_generate():
             temperature=temperature,
             top_k=top_k,
             top_p=top_p,
+            repetition_penalty=repetition_penalty,
             max_length=max_length,
             max_new_tokens=max_new_tokens,
         )
