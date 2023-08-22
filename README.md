@@ -147,3 +147,10 @@ Returns (JSON):
 - **ok** (bool)
 - **outputs** (str)
 - **traceback** (str) - the Python traceback if `ok == False`
+
+Example (curl):
+
+```bash
+$ curl -X POST "https://chat.petals.dev/api/v1/generate" -d "model=meta-llama/Llama-2-70b-chat-hf" -d "inputs=Once upon a time," -d "max_new_tokens=20"
+{"ok":true,"outputs":" there was a young woman named Sophia who lived in a small village nestled in the rolling hills"}
+```
