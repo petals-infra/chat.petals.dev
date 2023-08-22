@@ -61,7 +61,7 @@ const Regime = {
   FEW_SHOT: 2,
 };
 let curRegime = Regime.CHATBOT;
-let stop = false;
+let forceStop = false;
 
 function openSession() {
   let protocol = location.protocol == "https:" ? "wss:" : "ws:";
@@ -119,7 +119,7 @@ function sendReplica() {
     $('.stop-generation').click(e => {
       e.preventDefault();
       console.log("Stop generation");
-      stop = true;
+      forceStop = true;
     });
   } else {
     $('.loading-animation').show();
@@ -187,7 +187,7 @@ function receiveReplica(inputs) {
     }
     lastReplica.text(newText);
 
-    if (!response.stop && !stop) {
+    if (!response.stop && !forceStop) {
       if (tokenCount >= 1) {
         const speed = tokenCount / (totalElapsed / 1000);
         $('.speed')
@@ -198,10 +198,12 @@ function receiveReplica(inputs) {
         }
       }
     } else {
+      if (forceStop) {
+        resetSession();
+        forceStop = false;
+      }
       $('.loading-animation, .speed, .suggest-join, .generation-controls').remove();
-      resetSession();
       appendTextArea();
-      stop = false;
     }
   };
 }
