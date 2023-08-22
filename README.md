@@ -17,7 +17,7 @@ pip install -r requirements.txt
 flask run --host=0.0.0.0 --port=5000
 ```
 
-🦙 **Want to serve LLaMA 2?** Request access to its weights at the ♾️ [Meta AI website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and 🤗 [Model Hub](https://huggingface.co/meta-llama/Llama-2-70b-hf), then run `huggingface-cli login` in the terminal before starting the web app. If you don't want LLaMA 2, just remove the `meta-llama` repositories from [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py#L17).
+🦙 **Want to serve Llama 2?** Request access to its weights at the ♾️ [Meta AI website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and 🤗 [Model Hub](https://huggingface.co/meta-llama/Llama-2-70b-hf), then run `huggingface-cli login` in the terminal before starting the web app. If you don't want Llama 2, just remove the `meta-llama` repositories from [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py#L17).
 
 🦄 **Deploying with Gunicorn.** In production, we recommend using gunicorn instead of the Flask dev server:
 
@@ -56,7 +56,7 @@ If you develop your own web app, you can use our endpoint at `https://chat.petal
 
 | Model family | Embeds in 16-bit | Embeds in 32-bit |
 | --- | --- | --- |
-| LLaMA 2 (70B, 70B-Chat), LLaMA-65B, Guanaco-65B | 1.05 GB | 2.1 GB |
+| Llama 2 (70B, 70B-Chat), Llama-65B, Guanaco-65B | 1.05 GB | 2.1 GB |
 | BLOOM-176B, BLOOMZ-176B | 7.19 GB | 14.38 GB |
 
 ## WebSocket API (`/api/v2/generate`)
