@@ -23,7 +23,7 @@ const models = {
     stopToken: "###",
     extraStopSequences: ["</s>"],
   },
-  "enoch/llama-65b-hf": {
+  "huggyllama/llama-65b": {
     modelCard: "https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
     license: "https://bit.ly/llama-license",
     maxSessionLength: 2048,
