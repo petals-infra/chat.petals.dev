@@ -11,10 +11,11 @@ from petals.constants import PUBLIC_INITIAL_PEERS
 class ModelInfo:
     repo: str
     adapter: Optional[str] = None
+    name: Optional[str] = None
 
 
 MODELS = [
-    ModelInfo(repo="stabilityai/StableBeluga2"),
+    ModelInfo(repo="petals-team/StableBeluga2", name="stabilityai/StableBeluga2"),
     ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
     ModelInfo(repo="huggyllama/llama-65b", adapter="timdettmers/guanaco-65b"),
     ModelInfo(repo="huggyllama/llama-65b"),
