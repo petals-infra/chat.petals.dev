@@ -62,15 +62,28 @@ If you develop your own web app, you can use our endpoint at `https://chat.petal
 ## WebSocket API (`/api/v2/generate`)
 
 This API implies that you open a WebSocket connection and exchange JSON-encoded requests and responses.
-This may be done from any programming language, see the example on Javascript:
+This may be done from any programming language, see the basic example on Javascript:
 
 ```javascript
 const ws = new WebSocket(`wss://chat.petals.dev/api/v2/generate`);
 ws.onopen = () => {
-    ws.send(JSON.stringify({type: "open_inference_session", max_length: 1024}));
+    const prompt = "A cat sat on";
+    const maxLength = 30;
+    ws.send(JSON.stringify({type: "open_inference_session", model: "stabilityai/StableBeluga2", max_length: maxLength}));
+    ws.send(JSON.stringify({type: "generate", inputs: prompt, max_length: maxLength}));
     ws.onmessage = event => {
         const response = JSON.parse(event.data);
-        // TODO: Your code here
+        if (response.ok) {
+            if (response.outputs === undefined) {
+                console.log("Session opened, generating...");
+            } else {
+                console.log("Generated: " + prompt + response.outputs);
+                ws.close();
+            }
+        } else {
+            console.log("Error: " + response.traceback);
+            ws.close();
+        }
     };
 };
 ```
