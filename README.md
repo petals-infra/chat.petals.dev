@@ -40,7 +40,8 @@ If you develop your own web app, you can use our endpoint at `https://chat.petal
 
 > **Note:** We do not recommend using the endpoint at `https://chat.petals.dev/api/...` in production. It has a limited throughput, and we may pause or stop it any time.
 
-### Backend's system requirements
+<details>
+<summary><b>Endpoint's system requirements</b></summary>
 
 - If you use a CPU-only server, you need enough RAM to fit embeddings for all models (see the table below).
 
@@ -58,19 +59,30 @@ If you develop your own web app, you can use our endpoint at `https://chat.petal
 | --- | --- | --- |
 | Llama 2 (70B, 70B-Chat), Llama-65B, Guanaco-65B | 1.05 GB | 2.1 GB |
 | BLOOM-176B, BLOOMZ-176B | 7.19 GB | 14.38 GB |
+</details>
 
 ## WebSocket API (`/api/v2/generate`)
 
 This API implies that you open a WebSocket connection and exchange JSON-encoded requests and responses.
-This may be done from any programming language, see the basic example on Javascript:
+This may be done from any programming language.
+
+<details>
+<summary><b>Example code (Javascript)</b></summary>
+
+This code opens an inference session with the [stabilityai/StableBeluga2](https://huggingface.co/stabilityai/StableBeluga2) model, sends the prompt "A cat sat on",
+and samples new tokens until the total length reaches 30 tokens. Sampling is done with [temperature](https://huggingface.co/blog/how-to-generate#sampling) = 0.6 and [top_p](https://huggingface.co/blog/how-to-generate#top-p-nucleus-sampling) = 0.9.
 
 ```javascript
 const ws = new WebSocket(`wss://chat.petals.dev/api/v2/generate`);
 ws.onopen = () => {
     const prompt = "A cat sat on";
     const maxLength = 30;
-    ws.send(JSON.stringify({type: "open_inference_session", model: "stabilityai/StableBeluga2", max_length: maxLength}));
-    ws.send(JSON.stringify({type: "generate", inputs: prompt, max_length: maxLength}));
+    ws.send(JSON.stringify({
+        type: "open_inference_session", model: "stabilityai/StableBeluga2", max_length: maxLength
+    }));
+    ws.send(JSON.stringify({
+        type: "generate", inputs: prompt, max_length: maxLength, do_sample: 1, temperature: 0.6, top_p: 0.9
+    }));
     ws.onmessage = event => {
         const response = JSON.parse(event.data);
         if (response.ok) {
@@ -87,6 +99,7 @@ ws.onopen = () => {
     };
 };
 ```
+</details>
 
 The requests must follow this protocol:
 
