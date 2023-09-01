@@ -203,10 +203,15 @@ function receiveReplica(inputs) {
         forceStop = false;
       }
       $('.loading-animation, .speed, .suggest-join, .generation-controls').remove();
-      const applyMarkdown = $("#applyMarkdown").is(":checked");
-      if (applyMarkdown) {
-        const parsedHtmlContent = marked.parse(lastReplica.text());
-        lastReplica.html(parsedHtmlContent);  // Use .html() to set parsed HTML content
+
+      if ($('input#applyMarkdown').prop('checked')) {
+        const markdownText = marked.parse(lastReplica.text());
+        lastReplica.html(markdownText); // Using .html() since marked.parse() returns HTML
+
+        // Apply syntax highlighting to code within the text
+        lastReplica.find('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
       }
       appendTextArea();
     }

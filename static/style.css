@@ -345,7 +345,6 @@ pre, code {
 }
 
 pre {
-  padding: 1em;
   border-radius: 5px;
   overflow-x: auto; /* for long lines of code */
 }
