@@ -64,6 +64,12 @@
               <input type="radio" class="btn-check" name="model" value="bigscience/bloomz" id="model-bloomz">
               <label class="btn btn-outline-primary" for="model-bloomz">BLOOMZ-176B</label>
             </div>
+            <div class="apply_md">
+              <label>
+                <input type="checkbox" id="applyMarkdown" checked> Apply Markdown to model responses
+              </label>
+            </div>
+
           </div>
         </form>
       </div>
@@ -93,6 +99,7 @@
 </main>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="./static/autosize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="./static/chat.js?v=4"></script>
 
     <!-- Google tag (gtag.js) -->

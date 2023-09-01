@@ -203,6 +203,11 @@ function receiveReplica(inputs) {
         forceStop = false;
       }
       $('.loading-animation, .speed, .suggest-join, .generation-controls').remove();
+      const applyMarkdown = $("#applyMarkdown").is(":checked");
+      if (applyMarkdown) {
+        const parsedHtmlContent = marked.parse(lastReplica.text());
+        lastReplica.html(parsedHtmlContent);  // Use .html() to set parsed HTML content
+      }
       appendTextArea();
     }
   };
