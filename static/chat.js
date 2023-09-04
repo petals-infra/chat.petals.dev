@@ -1,4 +1,12 @@
 const models = {
+  "tiiuae/falcon-40b-instruct": {
+    modelCard: "https://huggingface.co/tiiuae/falcon-40b-instruct",
+    license: "https://huggingface.co/tiiuae/falcon-40b-instruct",
+    maxSessionLength: 8192,
+    sepToken: "###",
+    stopToken: "###",
+    extraStopSequences: ["</s>"],
+  },
   "stabilityai/StableBeluga2": {
     modelCard: "https://huggingface.co/stabilityai/StableBeluga2",
     license: "https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt",
@@ -40,7 +48,7 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "stabilityai/StableBeluga2";
+var curModel = "tiiuae/falcon-40b-instruct";
 
 const generationParams = {
   do_sample: 1,
