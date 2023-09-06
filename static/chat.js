@@ -1,7 +1,7 @@
 const models = {
-  "tiiuae/falcon-40b-instruct": {
-    modelCard: "https://huggingface.co/tiiuae/falcon-40b-instruct",
-    license: "https://huggingface.co/tiiuae/falcon-40b-instruct",
+  "tiiuae/falcon-180B-chat": {
+    modelCard: "https://huggingface.co/tiiuae/falcon-180B-chat",
+    license: "https://huggingface.co/tiiuae/falcon-180B-chat/blob/main/LICENSE.txt",
     maxSessionLength: 8192,
     sepToken: "###",
     stopToken: "###",
@@ -48,7 +48,7 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "tiiuae/falcon-40b-instruct";
+var curModel = "tiiuae/falcon-180B-chat";
 
 const generationParams = {
   do_sample: 1,
