@@ -150,6 +150,9 @@ function sendReplica() {
   for (var i = position; i < replicaDivs.length; i++) {
     const el = $(replicaDivs[i]);
     var phrase = el.text();
+    if (curModel === "tiiuae/falcon-180B-chat") {
+      phrase = phrase.replace(/^Assistant:/, 'Falcon:');
+    }
     if (el.is(".human-replica")) {
       phrase += models[curModel].sepToken;
     } else
