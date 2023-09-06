@@ -5,7 +5,7 @@ const models = {
     maxSessionLength: 8192,
     sepToken: "###",
     stopToken: "###",
-    extraStopSequences: ["</s>"],
+    extraStopSequences: ["<|endoftext|>"],
   },
   "stabilityai/StableBeluga2": {
     modelCard: "https://huggingface.co/stabilityai/StableBeluga2",
