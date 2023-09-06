@@ -1,7 +1,7 @@
 const models = {
   "tiiuae/falcon-180B-chat": {
     modelCard: "https://huggingface.co/tiiuae/falcon-180B-chat",
-    license: "https://huggingface.co/tiiuae/falcon-180B-chat/blob/main/LICENSE.txt",
+    license: "https://huggingface.co/spaces/tiiuae/falcon-180b-license/blob/main/LICENSE.txt",
     maxSessionLength: 8192,
     sepToken: "###",
     stopToken: "###",
