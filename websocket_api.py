@@ -23,6 +23,8 @@ def ws_api_generate(ws):
         logger.info(f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}")
 
         model, tokenizer = models[model_name]
+        if "falcon-180B" in model_name and request["private_api_key"] != config.PRIVATE_API_KEY:
+            raise ValueError("We do not provide public API for Falcon-180B due to license restrictions")
 
         with model.inference_session(max_length=request["max_length"]) as session:
             ws.send(json.dumps({"ok": True}))

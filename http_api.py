@@ -25,6 +25,8 @@ def http_api_generate():
         session_id = request.values.get("session_id")
         logger.info(f"generate(), model={repr(model_name)}, inputs={repr(inputs)}")
 
+        if "falcon-180B" in model_name:
+            raise ValueError("We do not provide public API for Falcon-180B due to license restrictions")
         if session_id is not None:
             raise RuntimeError(
                 "Reusing inference sessions was removed from HTTP API, please use WebSocket API instead"

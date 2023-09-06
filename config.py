@@ -39,3 +39,7 @@ else:
 
 STEP_TIMEOUT = 5 * 60
 MAX_SESSIONS = 50  # Has effect only for API v1 (HTTP-based)
+
+PRIVATE_API_KEY = "a26c493cb0a437007399086e7d94d320"
+# This key is for https://chat.petals.dev only.
+# You are NOT allowed to use it for your own projects due to Falcon-180B license restrictions.
