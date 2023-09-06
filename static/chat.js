@@ -52,8 +52,8 @@ var curModel = "tiiuae/falcon-180B-chat";
 
 const generationParams = {
   do_sample: 1,
-  temperature: 0.9,
-  top_p: 0.6,
+  temperature: 0.6,
+  top_p: 0.9,
 };
 
 var ws = null;
