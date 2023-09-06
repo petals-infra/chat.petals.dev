@@ -3,9 +3,9 @@ const models = {
     modelCard: "https://huggingface.co/tiiuae/falcon-180B-chat",
     license: "https://huggingface.co/spaces/tiiuae/falcon-180b-license/blob/main/LICENSE.txt",
     maxSessionLength: 8192,
-    sepToken: "###",
-    stopToken: "###",
-    extraStopSequences: ["<|endoftext|>", "\nFalcon:", " Falcon:", "\nUser:", " User:"],
+    sepToken: "\n",
+    stopToken: "\n",
+    extraStopSequences: ["<|endoftext|>", "\nFalcon:", " Falcon:", "\nUser:", " User:", "###"],
   },
   "stabilityai/StableBeluga2": {
     modelCard: "https://huggingface.co/stabilityai/StableBeluga2",
@@ -48,12 +48,19 @@ const models = {
     extraStopSequences: ["\n\nHuman"],
   },
 };
-var curModel = "tiiuae/falcon-180B-chat";
+const falconModel = "tiiuae/falcon-180B-chat";
+var curModel = falconModel;
 
 const generationParams = {
   do_sample: 1,
   temperature: 0.6,
   top_p: 0.9,
+};
+const falconGenerationParams = {
+  do_sample: 1,
+  temperature: 0.9,
+  top_p: 0.9,
+  repetition_penalty: 1.2,
 };
 
 var ws = null;
@@ -150,7 +157,8 @@ function sendReplica() {
   for (var i = position; i < replicaDivs.length; i++) {
     const el = $(replicaDivs[i]);
     var phrase = el.text();
-    if (curModel === "tiiuae/falcon-180B-chat") {
+    if (curModel === falconModel) {
+      phrase = phrase.replace(/^Human:/, 'User:');
       phrase = phrase.replace(/^Assistant:/, 'Falcon:');
     }
     if (el.is(".human-replica")) {
@@ -176,7 +184,7 @@ function receiveReplica(inputs) {
     max_new_tokens: 1,
     stop_sequence: models[curModel].stopToken,
     extra_stop_sequences: models[curModel].extraStopSequences,
-    ...generationParams
+    ...(curModel === falconModel ? falconGenerationParams : generationParams)
   }));
 
   var lastMessageTime = null;
@@ -197,7 +205,9 @@ function receiveReplica(inputs) {
 
     const lastReplica = $('.ai-replica .text').last();
     var newText = lastReplica.text() + response.outputs;
-    newText = newText.replace(models[curModel].stopToken, "");
+    if (curModel !== falconModel) {
+      newText = newText.replace(models[curModel].stopToken, "");
+    }
     if (models[curModel].extraStopSequences !== null) {
       for (const seq of models[curModel].extraStopSequences) {
         newText = newText.replace(seq, "");
