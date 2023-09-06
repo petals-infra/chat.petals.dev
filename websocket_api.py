@@ -68,7 +68,7 @@ def ws_api_generate(ws):
                     inputs = None  # Inputs are passed only for the 1st token of the bot's response
                     n_input_tokens = 0
                     combined = all_outputs + outputs
-                    stop = stop_sequence is None or (stop_sequence != "\n" and combined.endswith(stop_sequence))
+                    stop = stop_sequence is None or ("falcon-180B" not in model_name and combined.endswith(stop_sequence))
                     if extra_stop_sequences is not None:
                         for seq in extra_stop_sequences:
                             if combined.endswith(seq):
