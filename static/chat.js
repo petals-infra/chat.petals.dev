@@ -58,7 +58,7 @@ const generationParams = {
 };
 const falconGenerationParams = {
   do_sample: 1,
-  temperature: 0.9,
+  temperature: 0.75,
   top_p: 0.9,
   repetition_penalty: 1.2,
 };
@@ -158,6 +158,10 @@ function sendReplica() {
     const el = $(replicaDivs[i]);
     var phrase = el.text();
     if (curModel === falconModel) {
+      if (i < 2) {
+        // Skip the system prompt and the 1st assistant's message to match the HF demo format precisely
+        continue;
+      }
       phrase = phrase.replace(/^Human:/, 'User:');
       phrase = phrase.replace(/^Assistant:/, 'Falcon:');
     }
