@@ -49,7 +49,7 @@ const models = {
   },
 };
 const falconModel = "tiiuae/falcon-180B-chat";
-var curModel = falconModel;
+var curModel = "stabilityai/StableBeluga2";
 
 const generationParams = {
   do_sample: 1,
