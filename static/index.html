@@ -12,7 +12,7 @@
 
 <main>
   <div class="position-relative overflow-hidden px-5 pt-1 m-md-4 text-center">
-    <div class="col-lg-6 col-md-8 p-md-3 mx-auto my-3" style="max-width: 700px;">
+    <div class="col-lg-6 col-md-8 p-md-3 mx-auto my-3" style="max-width: 1440px;">
       <div class="mb-4">
         <div class="d-md-inline-block pe-md-4">
           <a target="_blank" href="https://petals.dev"><img src="./static/logo.svg" height="100" class="rot-image"></a>
@@ -64,6 +64,12 @@
               <input type="radio" class="btn-check" name="model" value="bigscience/bloomz" id="model-bloomz">
               <label class="btn btn-outline-primary" for="model-bloomz">BLOOMZ-176B</label>
             </div>
+            <div class="apply_md">
+              <label>
+                <input type="checkbox" id="applyMarkdown" checked> Apply Markdown to model responses
+              </label>
+            </div>
+
           </div>
         </form>
       </div>
@@ -91,8 +97,11 @@
     </div>
   </div>
 </main>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
     <script src="./static/autosize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/7.0.5/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script src="./static/chat.js?v=4"></script>
 
     <!-- Google tag (gtag.js) -->

@@ -1,5 +1,5 @@
 .container {
-  max-width: 960px;
+  max-width: 1440px;
 }
 
 /*
@@ -137,14 +137,15 @@ main p {
   border: 1px solid #777;
   border-radius: 10px;
   padding: 10px 15px;
-  width: 90%;
-  max-width: 360px;
+  width: 100%;
+  /* max-width: 720px; */
   text-align: left;
   word-wrap: break-word;
 }
 
 .human-replica, .ai-replica, .error-message {
   white-space: pre-wrap;
+  max-width: 720px;
 }
 
 .human-replica {
@@ -191,7 +192,7 @@ main p {
   background-color: #fff7f7;
   margin-left: auto;
   margin-right: 0;
-  max-width: 400px;
+  /* max-width: 400px; */
 }
 
 @media (max-width: 767px) {
@@ -254,4 +255,131 @@ main p {
 
 .reset-btn {
   font-size: 9pt;
+}
+
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.75em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+h4 {
+  font-size: 1.25em;
+}
+
+h5 {
+  font-size: 1em;
+}
+
+h6 {
+  font-size: 0.875em;
+}
+
+/* Links */
+a {
+  color: #0077cc;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Lists */
+ul, ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+li {
+  margin-bottom: 0.5em;
+}
+
+/* Strong and emphasis */
+strong, b {
+  font-weight: bold;
+}
+
+em, i {
+  font-style: italic;
+}
+
+
+/* Blockquotes */
+blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 1.5em;
+  border-left: 4px solid #ddd;
+  font-style: italic;
+  color: #666;
+}
+
+/* Horizontal rules */
+hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 1em 0;
+}
+
+/* Code Blocks and Inline Code */
+pre, code {
+  background-color: #2D2D2D;
+  color: #FFFFFF;
+}
+
+pre {
+  border-radius: 5px;
+  overflow-x: auto; /* for long lines of code */
+}
+
+code {
+  font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+table, th, td {
+  border: 1px solid #CCCCCC;
+}
+
+th, td {
+  padding: 0.5em;
+  text-align: left;
+}
+
+th {
+  background-color: #F5F5F5;
+}
+
+tr:nth-child(even) { /* even rows */
+  background-color: #F9F9F9;
+}
+
+tr:hover { /* hover effect */
+  background-color: #EFEFEF;
 }
