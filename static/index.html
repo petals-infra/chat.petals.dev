@@ -38,6 +38,8 @@
             <div class="btn-group family-selector" role="group">
               <input type="radio" class="btn-check" name="family" value="llama-2" id="family-llama-2" checked>
               <label class="btn btn-outline-primary" for="family-llama-2">Llama 2</label>
+              <input type="radio" class="btn-check" name="family" value="falcon" id="family-falcon">
+              <label class="btn btn-outline-primary" for="family-falcon">Falcon</label>
               <input type="radio" class="btn-check" name="family" value="llama" id="family-llama">
               <label class="btn btn-outline-primary" for="family-llama">Llama</label>
               <input type="radio" class="btn-check" name="family" value="bloom" id="family-bloom">
@@ -52,6 +54,10 @@
               <input type="radio" class="btn-check" name="model" value="meta-llama/Llama-2-70b-chat-hf" id="meta-llama-2-70b-chat-hf">
               <label class="btn btn-outline-primary" for="meta-llama-2-70b-chat-hf">Llama 2 (70B-chat)</label>
             </div>
+            <div class="model-selector btn-group" role="group" data-family="falcon" style="display: none;">
+              <input type="radio" class="btn-check" name="model" value="tiiuae/falcon-180B-chat" id="falcon-180B-chat">
+              <label class="btn btn-outline-primary" for="falcon-180B-chat">Falcon 180B-Chat</label>
+            </div>
             <div class="model-selector btn-group" role="group" data-family="llama" style="display: none;">
               <input type="radio" class="btn-check" name="model" value="timdettmers/guanaco-65b" id="model-guanaco-65b">
               <label class="btn btn-outline-primary" for="model-guanaco-65b">Guanaco-65B</label>
@@ -59,8 +65,6 @@
               <label class="btn btn-outline-primary" for="model-llama-65b-hf">Llama-65B</label>
             </div>
             <div class="model-selector btn-group" role="group" data-family="bloom" style="display: none;">
-              <!-- <input type="radio" class="btn-check" name="model" value="bigscience/bloom" id="model-bloom">
-              <label class="btn btn-outline-primary" for="model-bloomz">BLOOM-176B</label> -->
               <input type="radio" class="btn-check" name="model" value="bigscience/bloomz" id="model-bloomz">
               <label class="btn btn-outline-primary" for="model-bloomz">BLOOMZ-176B</label>
             </div>
@@ -86,14 +90,15 @@
       <p class="acknowledgements mt-5 pt-3">
         <!-- <a class="show-few-shot" href="#">Few-shot mode</a><br> -->
         <b>Shift+Enter</b> inserts newlines.<br>
-        See source code and API docs on <a target="_blank" href="https://github.com/petals-infra/chat.petals.dev">GitHub</a>.
+        See source code and API docs on <a target="_blank" href="https://github.com/petals-infra/chat.petals.dev">GitHub</a>.<br>
+        We do not provide API for Falcon-180B due to license restrictions.
       </p>
     </div>
   </div>
 </main>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="./static/autosize.min.js"></script>
-    <script src="./static/chat.js?v=4"></script>
+    <script src="./static/chat.js?v=17"></script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LENBCEYH86"></script>

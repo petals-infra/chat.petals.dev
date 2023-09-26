@@ -11,11 +11,13 @@ class ModelInfo:
     repo: str
     adapter: Optional[str] = None
     name: Optional[str] = None
+    public_api: bool = True
 
 
 MODELS = [
     ModelInfo(repo="petals-team/StableBeluga2", name="stabilityai/StableBeluga2"),
     ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
+    ModelInfo(repo="tiiuae/falcon-180B-chat", public_api=False),
     ModelInfo(repo="huggyllama/llama-65b", adapter="timdettmers/guanaco-65b"),
     ModelInfo(repo="huggyllama/llama-65b"),
     ModelInfo(repo="bigscience/bloomz"),
@@ -26,7 +28,7 @@ INITIAL_PEERS = PUBLIC_INITIAL_PEERS
 # Set this to a list of multiaddrs to connect to a private swarm instead of the public one, for example:
 # INITIAL_PEERS = ['/ip4/10.1.2.3/tcp/31234/p2p/QmcXhze98AcgGQDDYna23s4Jho96n8wkwLJv78vxtFNq44']
 
-DEVICE = "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 try:
     from cpufeature import CPUFeature

@@ -3,7 +3,7 @@ from traceback import format_exc
 
 import flask_sock
 import hivemind
-import torch
+from flask import request as http_request
 
 import config
 from app import sock, models
@@ -20,9 +20,14 @@ def ws_api_generate(ws):
         model_name = request.get("model")
         if model_name is None:
             model_name = config.DEFAULT_MODEL_NAME
-        logger.info(f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}")
+        logger.info(
+            f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}, "
+            f"origin={repr(http_request.origin)}"
+        )
 
-        model, tokenizer = models[model_name]
+        model, tokenizer, model_info = models[model_name]
+        if not model_info.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
+            raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         with model.inference_session(max_length=request["max_length"]) as session:
             ws.send(json.dumps({"ok": True}))
@@ -66,7 +71,7 @@ def ws_api_generate(ws):
                     inputs = None  # Inputs are passed only for the 1st token of the bot's response
                     n_input_tokens = 0
                     combined = all_outputs + outputs
-                    stop = stop_sequence is None or combined.endswith(stop_sequence)
+                    stop = stop_sequence is None or ("falcon-180B" not in model_name and combined.endswith(stop_sequence))
                     if extra_stop_sequences is not None:
                         for seq in extra_stop_sequences:
                             if combined.endswith(seq):

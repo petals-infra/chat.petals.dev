@@ -30,7 +30,7 @@ for model_info in config.MODELS:
     model_name = model_info.name
     if model_name is None:  # Use default name based on model/repo repo
         model_name = model_info.adapter if model_info.adapter is not None else model_info.repo
-    models[model_name] = model, tokenizer
+    models[model_name] = model, tokenizer, model_info
 
 logger.info("Starting Flask app")
 app = Flask(__name__)

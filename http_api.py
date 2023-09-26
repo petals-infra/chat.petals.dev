@@ -30,7 +30,9 @@ def http_api_generate():
                 "Reusing inference sessions was removed from HTTP API, please use WebSocket API instead"
             )
 
-        model, tokenizer = models[model_name]
+        model, tokenizer, model_info = models[model_name]
+        if not model_info.public_api:
+            raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         if inputs is not None:
             inputs = tokenizer(inputs, return_tensors="pt")["input_ids"].to(config.DEVICE)
