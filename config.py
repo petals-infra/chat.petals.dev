@@ -1,27 +1,57 @@
-from dataclasses import dataclass
-from typing import Optional
-
 import torch
-
 from petals.constants import PUBLIC_INITIAL_PEERS
 
+from data_structures import ModelInfo
 
-@dataclass
-class ModelInfo:
-    repo: str
-    adapter: Optional[str] = None
-    name: Optional[str] = None
-    public_api: bool = True
-
-
-MODELS = [
-    ModelInfo(repo="petals-team/StableBeluga2", name="stabilityai/StableBeluga2"),
-    ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
-    ModelInfo(repo="tiiuae/falcon-180B-chat", public_api=False),
-    ModelInfo(repo="huggyllama/llama-65b", adapter="timdettmers/guanaco-65b"),
-    ModelInfo(repo="huggyllama/llama-65b"),
-    ModelInfo(repo="bigscience/bloomz"),
-]
+MODELS = {
+    "Llama 2": [
+        ModelInfo(
+            name="Stable Beluga 2 (70B)",
+            model_card="https://huggingface.co/stabilityai/StableBeluga2",
+            license="https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt",
+            repository="petals-team/StableBeluga2",
+            aliases=["stabilityai/StableBeluga2"],
+        ),
+        ModelInfo(
+            name="Llama 2 (70B-Chat)",
+            model_card="https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
+            license="https://bit.ly/llama2-license",
+            repository="meta-llama/Llama-2-70b-chat-hf",
+        ),
+    ],
+    "Falcon": [
+        ModelInfo(
+            name="Falcon 180B-Chat",
+            model_card="https://huggingface.co/tiiuae/falcon-180B-chat",
+            license="https://huggingface.co/spaces/tiiuae/falcon-180b-license/blob/main/LICENSE.txt",
+            repository="tiiuae/falcon-180B-chat",
+            public_api=False,
+        ),
+    ],
+    "Llama": [
+        ModelInfo(
+            name="Guanaco-65B",
+            model_card="https://huggingface.co/timdettmers/guanaco-65b",
+            license="https://huggingface.co/timdettmers/guanaco-65b",
+            repository="huggyllama/llama-65b",
+            adapter="timdettmers/guanaco-65b",
+        ),
+        ModelInfo(
+            name="Llama-65B",
+            model_card="https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
+            license="https://bit.ly/llama-license",
+            repository="huggyllama/llama-65b",
+        ),
+    ],
+    "BLOOM": [
+        ModelInfo(
+            name="BLOOMZ-176B",
+            model_card="https://huggingface.co/bigscience/bloomz",
+            license="https://bit.ly/bloom-license",
+            repository="bigscience/bloomz",
+        ),
+    ],
+}
 
 INITIAL_PEERS = PUBLIC_INITIAL_PEERS
 # Set this to a list of multiaddrs to connect to a private swarm instead of the public one, for example:
@@ -31,6 +61,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 try:
     from cpufeature import CPUFeature
+
     has_avx512 = CPUFeature["AVX512f"] and CPUFeature["OS_AVX512"]
 except ImportError:
     has_avx512 = False

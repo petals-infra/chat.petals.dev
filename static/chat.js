@@ -7,7 +7,7 @@ const models = {
     stopToken: "\n",
     extraStopSequences: ["<|endoftext|>", "\nFalcon:", " Falcon:", "\nUser:", " User:", "###"],
   },
-  "stabilityai/StableBeluga2": {
+  "petals-team/StableBeluga2": {
     modelCard: "https://huggingface.co/stabilityai/StableBeluga2",
     license: "https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt",
     maxSessionLength: 8192,
