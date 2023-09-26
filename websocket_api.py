@@ -6,7 +6,7 @@ import hivemind
 from flask import request as http_request
 
 import config
-from app import sock, models
+from app import models, sock
 from utils import safe_decode
 
 logger = hivemind.get_logger(__file__)
@@ -21,8 +21,8 @@ def ws_api_generate(ws):
         max_length = request["max_length"]
         logger.info(f"ws.generate.open(), {model_name=}, {max_length=}, {http_request.origin=}")
 
-        model, tokenizer, model_info = models[model_name]
-        if not model_info.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
+        model, tokenizer, backend_config = models[model_name]
+        if not backend_config.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
             raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         with model.inference_session(max_length=max_length) as session:
@@ -44,10 +44,10 @@ def ws_api_generate(ws):
                 extra_stop_sequences = request.get("extra_stop_sequences")
                 if extra_stop_sequences is not None:
                     cont_token = tokenizer(stop_sequence, return_tensors="pt")["input_ids"].to(config.DEVICE)
-                    assert cont_token.shape == (1, 1), \
-                        "extra_stop_sequences require stop_sequence length to be exactly 1 token"
+                    if cont_token.shape != (1, 1):
+                        raise ValueError("extra_stop_sequences require stop_sequence length to be exactly 1 token")
 
-                all_outputs = ''
+                all_outputs = ""
                 delta_q = []
                 stop = False
                 while not stop:
@@ -67,13 +67,15 @@ def ws_api_generate(ws):
                     inputs = None  # Inputs are passed only for the 1st token of the bot's response
                     n_input_tokens = 0
                     combined = all_outputs + outputs
-                    stop = stop_sequence is None or ("falcon-180B" not in model_name and combined.endswith(stop_sequence))
+                    stop = stop_sequence is None or (
+                        "falcon-180B" not in model_name and combined.endswith(stop_sequence)
+                    )
                     if extra_stop_sequences is not None:
                         for seq in extra_stop_sequences:
                             if combined.endswith(seq):
                                 stop = True
                                 session.last_token_id = cont_token
-                    if not stop and outputs[-10:].find(u'\ufffd') > -1:
+                    if not stop and outputs[-10:].find("\ufffd") > -1:
                         # If there's a replacement character, keep getting more tokens
                         # until we can decode properly
                         delta_q = delta_q + delta

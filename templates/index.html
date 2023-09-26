@@ -25,10 +25,10 @@
       <div class="welcome mb-4">
         <div>
           <b>Welcome!</b> This is a demo app running
-          <a target="_blank" class="model-name" href="https://huggingface.co/stabilityai/StableBeluga2">Stable Beluga 2 (70B)</a>
+          <a target="_blank" class="model-name" href="{{ default_model.frontend.model_card }}">{{ default_model.frontend.name }}</a>
           over the <a target="_blank" href="https://petals.dev">Petals</a> network.
           Please follow the model's
-          <a target="_blank" class="license-link" href="https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt">terms of use</a>
+          <a target="_blank" class="license-link" href="{{ default_model.frontend.license }}">terms of use</a>
           and do not enter sensitive data.
           The chat history is recorded.
         </div>
@@ -36,38 +36,29 @@
           <div class="mt-2">
             <label class="group-label">Family:</label>
             <div class="btn-group family-selector" role="group">
-              <input type="radio" class="btn-check" name="family" value="llama-2" id="family-llama-2" checked>
-              <label class="btn btn-outline-primary" for="family-llama-2">Llama 2</label>
-              <input type="radio" class="btn-check" name="family" value="falcon" id="family-falcon">
-              <label class="btn btn-outline-primary" for="family-falcon">Falcon</label>
-              <input type="radio" class="btn-check" name="family" value="llama" id="family-llama">
-              <label class="btn btn-outline-primary" for="family-llama">Llama</label>
-              <input type="radio" class="btn-check" name="family" value="bloom" id="family-bloom">
-              <label class="btn btn-outline-primary" for="family-bloom">BLOOM</label>
+              {% for family in model_families.keys() %}
+              {% set family_id = family.lower().replace(" ", "-") %}
+              <input type="radio" class="btn-check" name="family" value="{{ family_id }}" id="family-{{ family_id }}"
+                  {% if loop.first %}checked{% endif %}>
+              <label class="btn btn-outline-primary" for="family-{{ family_id }}">{{ family }}</label>
+              {% endfor %}
             </div>
           </div>
           <div class="mt-2">
             <label class="group-label">Model:</label>
-            <div class="model-selector btn-group" role="group" data-family="llama-2">
-              <input type="radio" class="btn-check" name="model" value="stabilityai/StableBeluga2" id="stablebeluga2" checked>
-              <label class="btn btn-outline-primary" for="stablebeluga2">Stable Beluga 2 (70B)</label>
-              <input type="radio" class="btn-check" name="model" value="meta-llama/Llama-2-70b-chat-hf" id="meta-llama-2-70b-chat-hf">
-              <label class="btn btn-outline-primary" for="meta-llama-2-70b-chat-hf">Llama 2 (70B-chat)</label>
+            {% for family, family_models in model_families.items() %}
+            {% set family_id = family.lower().replace(" ", "-") %}
+            {% set family_loop = loop %}
+            <div class="model-selector btn-group" role="group" data-family="{{ family_id }}"
+                {% if not loop.first %}style="display: none;"{% endif %}>
+              {% for model in family_models %}
+              {% set model_id = model.backend.key.lower().replace("/", "-") %}
+              <input type="radio" class="btn-check" name="model" value="{{ model.backend.key }}" id="{{ model_id }}"
+                  {% if family_loop.first and loop.first %}checked{% endif %}>
+              <label class="btn btn-outline-primary" for="{{ model_id }}">{{ model.frontend.name }}</label>
+              {% endfor %}
             </div>
-            <div class="model-selector btn-group" role="group" data-family="falcon" style="display: none;">
-              <input type="radio" class="btn-check" name="model" value="tiiuae/falcon-180B-chat" id="falcon-180B-chat">
-              <label class="btn btn-outline-primary" for="falcon-180B-chat">Falcon 180B-Chat</label>
-            </div>
-            <div class="model-selector btn-group" role="group" data-family="llama" style="display: none;">
-              <input type="radio" class="btn-check" name="model" value="timdettmers/guanaco-65b" id="model-guanaco-65b">
-              <label class="btn btn-outline-primary" for="model-guanaco-65b">Guanaco-65B</label>
-              <input type="radio" class="btn-check" name="model" value="huggyllama/llama-65b" id="model-llama-65b-hf">
-              <label class="btn btn-outline-primary" for="model-llama-65b-hf">Llama-65B</label>
-            </div>
-            <div class="model-selector btn-group" role="group" data-family="bloom" style="display: none;">
-              <input type="radio" class="btn-check" name="model" value="bigscience/bloomz" id="model-bloomz">
-              <label class="btn btn-outline-primary" for="model-bloomz">BLOOMZ-176B</label>
-            </div>
+            {% endfor %}
           </div>
         </form>
       </div>
@@ -88,7 +79,6 @@
       </p>
 
       <p class="acknowledgements mt-5 pt-3">
-        <!-- <a class="show-few-shot" href="#">Few-shot mode</a><br> -->
         <b>Shift+Enter</b> inserts newlines.<br>
         See source code and API docs on <a target="_blank" href="https://github.com/petals-infra/chat.petals.dev">GitHub</a>.<br>
         We do not provide API for Falcon-180B due to license restrictions.
@@ -98,7 +88,12 @@
 </main>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="./static/autosize.min.js"></script>
-    <script src="./static/chat.js?v=17"></script>
+
+    <script>
+      const modelConfigs = {{ model_config_json|safe }};
+      const defaultModel = {{ default_model.backend.key|tojson|safe }};
+    </script>
+    <script src="./static/chat.js?v=18"></script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LENBCEYH86"></script>

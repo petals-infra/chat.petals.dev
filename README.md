@@ -17,7 +17,7 @@ pip install -r requirements.txt
 flask run --host=0.0.0.0 --port=5000
 ```
 
-🦙 **Want to serve Llama 2?** Request access to its weights at the ♾️ [Meta AI website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and 🤗 [Model Hub](https://huggingface.co/meta-llama/Llama-2-70b-hf), then run `huggingface-cli login` in the terminal before starting the web app. If you don't want Llama 2, just remove the `meta-llama` repositories from [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py#L17).
+🦙 **Want to serve Llama 2?** Request access to its weights at the ♾️ [Meta AI website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and 🤗 [Model Hub](https://huggingface.co/meta-llama/Llama-2-70b-hf), then run `huggingface-cli login` in the terminal before starting the web app. If you don't want Llama 2, just remove the `meta-llama` models from [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py).
 
 🦄 **Deploying with Gunicorn.** In production, we recommend using gunicorn instead of the Flask dev server:
 
@@ -110,7 +110,8 @@ The requests must follow this protocol:
 
 The first request must be of type **open_inference_session** and include these parameters:
 
-- **model** (str) - Model name (one of models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py)).
+- **model** (str) - Model repository for one of the models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py).
+    If you load a model with an adapter, use the adapter repository here instead.
 - **max_length** (int) - Max length of generated text (including prefix and intermediate inputs) in tokens.
 
 Notes:
@@ -161,7 +162,8 @@ Response (one or multiple):
 
 Parameters:
 
-- **model** (str) - Model name (one of models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py)).
+- **model** (str) - Model repository for one of the models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py).
+    If you load a model with an adapter, use the adapter repository here instead.
 - **inputs** (str, optional) - New user inputs. May be omitted if you continue generation in an inference session (see below).
 - **max_length** (int) - Max length of generated text (including prefix) in tokens.
 - **max_new_tokens** (int) - Max number of newly generated tokens (excluding prefix).
