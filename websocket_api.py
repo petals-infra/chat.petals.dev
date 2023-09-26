@@ -22,7 +22,7 @@ def ws_api_generate(ws):
             model_name = config.DEFAULT_MODEL_NAME
         logger.info(
             f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}, "
-            f"origin={repr(http_request.origin)=}"
+            f"origin={repr(http_request.origin)}"
         )
 
         model, tokenizer, model_info = models[model_name]
