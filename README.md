@@ -101,6 +101,9 @@ ws.onopen = () => {
 ```
 </details>
 
+🐍 **Using Python on Linux/macOS?** Please consider running the [native Petals client](https://github.com/bigscience-workshop/petals#readme) instead.
+This way, you can connect to the swarm directly (without this API endpoint) and even run fine-tuning.
+
 The requests must follow this protocol:
 
 ### open_inference_session
@@ -110,8 +113,11 @@ The first request must be of type **open_inference_session** and include these p
 - **model** (str) - Model name (one of models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py)).
 - **max_length** (int) - Max length of generated text (including prefix and intermediate inputs) in tokens.
 
-The inference session created by this request is unique to this WebSocket connection and cannot be reused in other connections.
-It is closed automatically when the connection is closed.
+Notes:
+
+- The inference session created by this request is unique to this WebSocket connection and cannot be reused in other connections.
+- The session is closed automatically when the connection is closed (gracefully or abruptly).
+- We do not provide API for Falcon-180B due to its [license](https://huggingface.co/spaces/tiiuae/falcon-180b-license/blob/main/LICENSE.txt) restrictions.
 
 Request:
 
@@ -157,18 +163,24 @@ Parameters:
 
 - **model** (str) - Model name (one of models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py)).
 - **inputs** (str, optional) - New user inputs. May be omitted if you continue generation in an inference session (see below).
-- **do_sample** (bool, optional) - If `0` (default), runs greedy generation. If `1`, performs sampling with parameters below.
-- **temperature** (float, optional)
-- **top_k** (int, optional)
-- **top_p** (float, optional)
 - **max_length** (int) - Max length of generated text (including prefix) in tokens.
 - **max_new_tokens** (int) - Max number of newly generated tokens (excluding prefix).
+
+Generation parameters (compatible with [.generate()](https://huggingface.co/blog/how-to-generate) from 🤗 Transformers):
+
+- **do_sample** (bool, optional) - If `0` (default), runs [greedy generation](https://huggingface.co/blog/how-to-generate#greedy-search).
+    If `1`, performs [sampling](https://huggingface.co/blog/how-to-generate#sampling) with parameters below.
+- **temperature** (float, optional) - Temperature for sampling.
+- **top_k** (int, optional) - [Top-k](https://huggingface.co/blog/how-to-generate#top-k-sampling) sampling.
+- **top_p** (float, optional) - [Top-p](https://huggingface.co/blog/how-to-generate#top-p-nucleus-sampling) (nucleus) sampling.
+- **repetition_penalty** (float, optional) - [Repetition penalty](https://huggingface.co/docs/transformers/main/en/main_classes/text_generation#transformers.GenerationConfig.repetition_penalty), see [paper](https://arxiv.org/abs/1909.05858).
 
 Notes:
 
 - You need to specify either `max_length` or `max_new_tokens`.
 - If you'd like to solve downstream tasks in the zero-shot mode, start with `do_sample=0` (default).
-- If you'd like to make a chat bot or write a long text, start with `do_sample=1, temperature=0.75, top_p=0.9` (tuning these params may help).
+- If you'd like to make a chat bot or write a long text, start with `do_sample=1, temperature=0.6, top_p=0.9`.
+- We do not provide API for Falcon-180B due to its [license](https://huggingface.co/spaces/tiiuae/falcon-180b-license/blob/main/LICENSE.txt) restrictions.
 
 Returns (JSON):
 
