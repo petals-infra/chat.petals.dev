@@ -109,4 +109,3 @@ else:
     TORCH_DTYPE = torch.float32  # You can use bfloat16 in this case too, but it will be slow
 
 STEP_TIMEOUT = 5 * 60
-MAX_SESSIONS = 50  # Has effect only for API v1 (HTTP-based)
