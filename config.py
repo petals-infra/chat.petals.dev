@@ -12,12 +12,13 @@ class ModelInfo:
     repo: str
     adapter: Optional[str] = None
     name: Optional[str] = None
+    public_api: bool = True
 
 
 MODELS = [
-    ModelInfo(repo="tiiuae/falcon-180B-chat"),
     ModelInfo(repo="petals-team/StableBeluga2", name="stabilityai/StableBeluga2"),
     ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
+    ModelInfo(repo="tiiuae/falcon-180B-chat", public_api=False),
     ModelInfo(repo="huggyllama/llama-65b", adapter="timdettmers/guanaco-65b"),
     ModelInfo(repo="huggyllama/llama-65b"),
     ModelInfo(repo="bigscience/bloomz"),
@@ -39,7 +40,3 @@ else:
 
 STEP_TIMEOUT = 5 * 60
 MAX_SESSIONS = 50  # Has effect only for API v1 (HTTP-based)
-
-PRIVATE_API_KEY = "a26c493cb0a437007399086e7d94d320"
-# This key is for https://chat.petals.dev only.
-# You are NOT allowed to use it for your own projects due to Falcon-180B license restrictions.

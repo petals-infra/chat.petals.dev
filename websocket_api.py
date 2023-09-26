@@ -3,7 +3,7 @@ from traceback import format_exc
 
 import flask_sock
 import hivemind
-import torch
+from flask import request as http_request
 
 import config
 from app import sock, models
@@ -20,11 +20,14 @@ def ws_api_generate(ws):
         model_name = request.get("model")
         if model_name is None:
             model_name = config.DEFAULT_MODEL_NAME
-        logger.info(f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}")
+        logger.info(
+            f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}, "
+            f"origin={repr(http_request.origin)=}"
+        )
 
-        model, tokenizer = models[model_name]
-        if "falcon-180B" in model_name and request["private_api_key"] != config.PRIVATE_API_KEY:
-            raise ValueError("We do not provide public API for Falcon-180B due to license restrictions")
+        model, tokenizer, model_info = models[model_name]
+        if not model_info.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
+            raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         with model.inference_session(max_length=request["max_length"]) as session:
             ws.send(json.dumps({"ok": True}))

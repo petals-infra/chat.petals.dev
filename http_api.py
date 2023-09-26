@@ -25,14 +25,14 @@ def http_api_generate():
         session_id = request.values.get("session_id")
         logger.info(f"generate(), model={repr(model_name)}, inputs={repr(inputs)}")
 
-        if "falcon-180B" in model_name:
-            raise ValueError("We do not provide public API for Falcon-180B due to license restrictions")
         if session_id is not None:
             raise RuntimeError(
                 "Reusing inference sessions was removed from HTTP API, please use WebSocket API instead"
             )
 
-        model, tokenizer = models[model_name]
+        model, tokenizer, model_info = models[model_name]
+        if not model_info.public_api:
+            raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         if inputs is not None:
             inputs = tokenizer(inputs, return_tensors="pt")["input_ids"].to(config.DEVICE)

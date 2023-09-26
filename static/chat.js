@@ -82,14 +82,7 @@ function openSession() {
   let protocol = location.protocol == "https:" ? "wss:" : "ws:";
   ws = new WebSocket(`${protocol}//${location.host}/api/v2/generate`);
   ws.onopen = () => {
-    ws.send(JSON.stringify({
-      type: "open_inference_session",
-      model: curModel,
-      max_length: sessionLength,
-      private_api_key: "a26c493cb0a437007399086e7d94d320",
-      // This key is for https://chat.petals.dev only.
-      // You are NOT allowed to use it for your own projects due to Falcon-180B license restrictions.
-    }));
+    ws.send(JSON.stringify({type: "open_inference_session", model: curModel, max_length: sessionLength}));
     ws.onmessage = event => {
       const response = JSON.parse(event.data);
       if (!response.ok) {
