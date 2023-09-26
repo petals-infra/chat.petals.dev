@@ -20,9 +20,9 @@ sock = Sock(app)
 
 @app.route("/")
 def main_page():
-    default_family = list(config.MODELS.values())[0]
+    default_family = list(config.MODEL_FAMILIES.values())[0]
     default_model = list(default_family)[0]
-    return render_template("index.html", default_model=default_model, models=config.MODELS)
+    return render_template("index.html", default_model=default_model, model_families=config.MODEL_FAMILIES)
 
 
 import http_api

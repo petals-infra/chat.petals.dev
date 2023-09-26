@@ -24,8 +24,8 @@ def http_api_generate():
         max_new_tokens = get_typed_arg("max_new_tokens", int)
         logger.info(f"generate(), {model_name=}, {inputs=}")
 
-        model, tokenizer, model_info = models[model_name]
-        if not model_info.public_api:
+        model, tokenizer, backend_config = models[model_name]
+        if not backend_config.public_api:
             raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         if inputs is not None:

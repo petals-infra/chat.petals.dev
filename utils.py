@@ -6,33 +6,35 @@ from petals import AutoDistributedModelForCausalLM
 from transformers import AutoTokenizer, PreTrainedModel, PreTrainedTokenizer
 
 import config
-from data_structures import ModelInfo
+from data_structures import ModelConfig
 
 logger = hivemind.get_logger(__file__)
 
 
-def load_models() -> Dict[str, Tuple[PreTrainedModel, PreTrainedTokenizer, ModelInfo]]:
+def load_models() -> Dict[str, Tuple[PreTrainedModel, PreTrainedTokenizer, ModelConfig]]:
     models = {}
-    for family in config.MODELS.values():
-        for model_info in family:
-            logger.info(f"Loading tokenizer for {model_info.repository}")
-            tokenizer = AutoTokenizer.from_pretrained(model_info.repository, add_bos_token=False, use_fast=False)
+    for family in config.MODEL_FAMILIES.values():
+        for model_config in family:
+            backend_config = model_config.backend
+
+            logger.info(f"Loading tokenizer for {backend_config.repository}")
+            tokenizer = AutoTokenizer.from_pretrained(backend_config.repository, add_bos_token=False, use_fast=False)
 
             logger.info(
-                f"Loading model {model_info.repository} with adapter {model_info.adapter} in {config.TORCH_DTYPE}"
+                f"Loading model {backend_config.repository} with adapter {backend_config.adapter} in {config.TORCH_DTYPE}"
             )
             # We set use_fast=False since LlamaTokenizerFast takes a long time to init
             model = AutoDistributedModelForCausalLM.from_pretrained(
-                model_info.repository,
-                active_adapter=model_info.adapter,
+                backend_config.repository,
+                active_adapter=backend_config.adapter,
                 torch_dtype=config.TORCH_DTYPE,
                 initial_peers=config.INITIAL_PEERS,
                 max_retries=3,
             )
             model = model.to(config.DEVICE)
 
-            for key in [model_info.key] + list(model_info.aliases):
-                models[key] = model, tokenizer, model_info
+            for key in [backend_config.key] + list(backend_config.aliases):
+                models[key] = model, tokenizer, backend_config
     return models
 
 

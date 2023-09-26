@@ -21,8 +21,8 @@ def ws_api_generate(ws):
         max_length = request["max_length"]
         logger.info(f"ws.generate.open(), {model_name=}, {max_length=}, {http_request.origin=}")
 
-        model, tokenizer, model_info = models[model_name]
-        if not model_info.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
+        model, tokenizer, backend_config = models[model_name]
+        if not backend_config.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
             raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
         with model.inference_session(max_length=max_length) as session:
