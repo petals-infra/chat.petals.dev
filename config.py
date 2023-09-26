@@ -1,7 +1,7 @@
 import torch
 from petals.constants import PUBLIC_INITIAL_PEERS
 
-from data_structures import ModelBackendConfig, ModelChatConfig, ModelFrontendConfig, ModelConfig
+from data_structures import ModelBackendConfig, ModelChatConfig, ModelConfig, ModelFrontendConfig
 
 default_chat_config = ModelChatConfig(
     max_session_length=8192,
