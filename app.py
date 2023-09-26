@@ -1,3 +1,6 @@
+import dataclasses
+import json
+
 import hivemind
 from flask import Flask, render_template
 from flask_cors import CORS
@@ -22,7 +25,19 @@ sock = Sock(app)
 def main_page():
     default_family = list(config.MODEL_FAMILIES.values())[0]
     default_model = list(default_family)[0]
-    return render_template("index.html", default_model=default_model, model_families=config.MODEL_FAMILIES)
+
+    model_configs = {
+        model_config.backend.key: model_config
+        for family_models in config.MODEL_FAMILIES.values()
+        for model_config in family_models
+    }
+
+    return render_template(
+        "index.html",
+        default_model=default_model,
+        model_families=config.MODEL_FAMILIES,
+        model_config_json=json.dumps(model_configs, default=dataclasses.asdict),
+    )
 
 
 import http_api

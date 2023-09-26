@@ -1,67 +1,9 @@
-const models = {
-  "tiiuae/falcon-180B-chat": {
-    modelCard: "https://huggingface.co/tiiuae/falcon-180B-chat",
-    license: "https://huggingface.co/spaces/tiiuae/falcon-180b-license/blob/main/LICENSE.txt",
-    maxSessionLength: 8192,
-    sepToken: "\n",
-    stopToken: "\n",
-    extraStopSequences: ["<|endoftext|>", "\nFalcon:", " Falcon:", "\nUser:", " User:", "###"],
-  },
-  "petals-team/StableBeluga2": {
-    modelCard: "https://huggingface.co/stabilityai/StableBeluga2",
-    license: "https://huggingface.co/stabilityai/StableBeluga2/blob/main/LICENSE.txt",
-    maxSessionLength: 8192,
-    sepToken: "###",
-    stopToken: "###",
-    extraStopSequences: ["</s>"],
-  },
-  "meta-llama/Llama-2-70b-chat-hf": {
-    modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
-    license: "https://bit.ly/llama2-license",
-    maxSessionLength: 8192,
-    sepToken: "###",
-    stopToken: "###",
-    extraStopSequences: ["</s>"],
-  },
-  "timdettmers/guanaco-65b": {
-    modelCard: "https://huggingface.co/timdettmers/guanaco-65b",
-    license: "https://huggingface.co/timdettmers/guanaco-65b",
-    maxSessionLength: 2048,
-    sepToken: "###",
-    stopToken: "###",
-    extraStopSequences: ["</s>"],
-  },
-  "huggyllama/llama-65b": {
-    modelCard: "https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
-    license: "https://bit.ly/llama-license",
-    maxSessionLength: 2048,
-    sepToken: "###",
-    stopToken: "###",
-    extraStopSequences: ["</s>"],
-  },
-  "bigscience/bloomz": {
-    modelCard: "https://huggingface.co/bigscience/bloomz",
-    license: "https://bit.ly/bloom-license",
-    maxSessionLength: 2048,
-    sepToken: "\n\n",
-    stopToken: "</s>",
-    extraStopSequences: ["\n\nHuman"],
-  },
-};
+var curModel = defaultModel;
 const falconModel = "tiiuae/falcon-180B-chat";
-var curModel = "stabilityai/StableBeluga2";
 
-const generationParams = {
-  do_sample: 1,
-  temperature: 0.6,
-  top_p: 0.9,
-};
-const falconGenerationParams = {
-  do_sample: 1,
-  temperature: 0.75,
-  top_p: 0.9,
-  repetition_penalty: 1.2,
-};
+function getConfig() {
+  return modelConfigs[curModel];
+}
 
 var ws = null;
 var position = 0;
@@ -153,10 +95,10 @@ function sendReplica() {
       phrase = phrase.replace(/^Assistant:/, 'Falcon:');
     }
     if (el.is(".human-replica")) {
-      phrase += models[curModel].sepToken;
+      phrase += getConfig().chat.sep_token;
     } else
     if (i < replicaDivs.length - 1) {
-      phrase += models[curModel].stopToken;
+      phrase += getConfig().chat.stop_token;
     }
     replicas.push(phrase);
   }
@@ -173,9 +115,9 @@ function receiveReplica(inputs) {
     type: "generate",
     inputs: inputs,
     max_new_tokens: 1,
-    stop_sequence: models[curModel].stopToken,
-    extra_stop_sequences: models[curModel].extraStopSequences,
-    ...(curModel === falconModel ? falconGenerationParams : generationParams)
+    stop_sequence: getConfig().chat.stop_token,
+    extra_stop_sequences: getConfig().chat.extra_stop_sequences,
+    ...getConfig().chat.generation_params,
   }));
 
   var lastMessageTime = null;
@@ -197,10 +139,10 @@ function receiveReplica(inputs) {
     const lastReplica = $('.ai-replica .text').last();
     var newText = lastReplica.text() + response.outputs;
     if (curModel !== falconModel) {
-      newText = newText.replace(models[curModel].stopToken, "");
+      newText = newText.replace(getConfig().chat.stop_token, "");
     }
-    if (models[curModel].extraStopSequences !== null) {
-      for (const seq of models[curModel].extraStopSequences) {
+    if (getConfig().chat.extra_stop_sequences !== null) {
+      for (const seq of getConfig().chat.extra_stop_sequences) {
         newText = newText.replace(seq, "");
       }
     }
@@ -239,9 +181,10 @@ function handleFailure(message, autoRetry = false) {
     if (/Session .+ expired/.test(message)) {
       autoRetry = true;
     }
-    if (/Maximum length exceeded/.test(message) && sessionLength < models[curModel].maxSessionLength) {
+    const maxSessionLength = getConfig().chat.max_session_length;
+    if (/Maximum length exceeded/.test(message) && sessionLength < maxSessionLength) {
       // We gradually increase sessionLength to save server resources. Default: 512 -> 2048 -> 8192 (if supported)
-      sessionLength = Math.min(sessionLength * 4, models[curModel].maxSessionLength);
+      sessionLength = Math.min(sessionLength * 4, maxSessionLength);
       autoRetry = true;
     }
 
@@ -334,8 +277,8 @@ $(() => {
 
     $('.model-name')
       .text($(this).text())
-      .attr('href', models[curModel].modelCard);
-    $('.license-link').attr('href', models[curModel].license);
+      .attr('href', getConfig().frontend.model_card);
+    $('.license-link').attr('href', getConfig().frontend.license);
     setTimeout(() => $('.human-replica textarea').focus(), 10);
   });
   $('.retry-link').click(e => {
