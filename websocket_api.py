@@ -17,19 +17,15 @@ def ws_api_generate(ws):
     try:
         request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
         assert request["type"] == "open_inference_session"
-        model_name = request.get("model")
-        if model_name is None:
-            model_name = config.DEFAULT_MODEL_NAME
-        logger.info(
-            f"ws.generate.open(), model={repr(model_name)}, max_length={repr(request['max_length'])}, "
-            f"origin={repr(http_request.origin)}"
-        )
+        model_name = request["model"]
+        max_length = request["max_length"]
+        logger.info(f"ws.generate.open(), {model_name=}, {max_length=}, {http_request.origin=}")
 
         model, tokenizer, model_info = models[model_name]
         if not model_info.public_api and http_request.origin != f"{http_request.scheme}://{http_request.host}":
             raise ValueError(f"We do not provide public API for {model_name} due to license restrictions")
 
-        with model.inference_session(max_length=request["max_length"]) as session:
+        with model.inference_session(max_length=max_length) as session:
             ws.send(json.dumps({"ok": True}))
 
             while True:

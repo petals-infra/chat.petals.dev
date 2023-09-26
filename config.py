@@ -22,7 +22,6 @@ MODELS = [
     ModelInfo(repo="huggyllama/llama-65b"),
     ModelInfo(repo="bigscience/bloomz"),
 ]
-DEFAULT_MODEL_NAME = "huggyllama/llama-65b"
 
 INITIAL_PEERS = PUBLIC_INITIAL_PEERS
 # Set this to a list of multiaddrs to connect to a private swarm instead of the public one, for example:

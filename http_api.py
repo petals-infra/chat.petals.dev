@@ -13,7 +13,7 @@ logger = hivemind.get_logger(__file__)
 @app.post("/api/v1/generate")
 def http_api_generate():
     try:
-        model_name = get_typed_arg("model", str, config.DEFAULT_MODEL_NAME)
+        model_name = get_typed_arg("model", str)
         inputs = request.values.get("inputs")
         do_sample = get_typed_arg("do_sample", int, False)
         temperature = get_typed_arg("temperature", float)
@@ -22,13 +22,7 @@ def http_api_generate():
         repetition_penalty = get_typed_arg("repetition_penalty", float)
         max_length = get_typed_arg("max_length", int)
         max_new_tokens = get_typed_arg("max_new_tokens", int)
-        session_id = request.values.get("session_id")
-        logger.info(f"generate(), model={repr(model_name)}, inputs={repr(inputs)}")
-
-        if session_id is not None:
-            raise RuntimeError(
-                "Reusing inference sessions was removed from HTTP API, please use WebSocket API instead"
-            )
+        logger.info(f"generate(), {model_name=}, {inputs=}")
 
         model, tokenizer, model_info = models[model_name]
         if not model_info.public_api:

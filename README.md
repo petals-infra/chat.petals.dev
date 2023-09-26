@@ -105,8 +105,10 @@ The requests must follow this protocol:
 
 ### open_inference_session
 
-The first request must be of type **open_inference_session** and include the `max_length` parameter (int, required)
-and, optionally, the `model` (str) parameter (default: `config.DEFAULT_MODEL_NAME`).
+The first request must be of type **open_inference_session** and include these parameters:
+
+- **model** (str) - Model name (one of models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py)).
+- **max_length** (int) - Max length of generated text (including prefix and intermediate inputs) in tokens.
 
 The inference session created by this request is unique to this WebSocket connection and cannot be reused in other connections.
 It is closed automatically when the connection is closed.
@@ -153,7 +155,7 @@ Response (one or multiple):
 
 Parameters:
 
-- **model** (str, optional) - Model name. Default: `config.DEFAULT_MODEL_NAME`.
+- **model** (str) - Model name (one of models defined in [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py)).
 - **inputs** (str, optional) - New user inputs. May be omitted if you continue generation in an inference session (see below).
 - **do_sample** (bool, optional) - If `0` (default), runs greedy generation. If `1`, performs sampling with parameters below.
 - **temperature** (float, optional)
