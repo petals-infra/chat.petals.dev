@@ -70,12 +70,6 @@ var sessionLength = initialSessionLength;
 var connFailureBefore = false;
 
 var totalElapsed, tokenCount;
-
-const Regime = {
-  CHATBOT: 1,
-  FEW_SHOT: 2,
-};
-let curRegime = Regime.CHATBOT;
 let forceStop = false;
 
 function openSession() {
@@ -116,7 +110,7 @@ function isWaitingForInputs() {
 
 function sendReplica() {
   if (isWaitingForInputs()) {
-    const aiPrompt = (curRegime === Regime.CHATBOT) ? 'Assistant:' : '';
+    const aiPrompt = "Assistant:";
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<p class="ai-replica">' +
@@ -273,7 +267,7 @@ function retry() {
 }
 
 function appendTextArea() {
-  const humanPrompt = (curRegime === Regime.CHATBOT) ? "Human: " : "";
+  const humanPrompt = "Human: ";
   $('.dialogue').append($(
     `<p class="human-replica"><textarea class="form-control" id="exampleTextarea" rows="2">${humanPrompt}</textarea></p>`
   ));
@@ -332,11 +326,7 @@ $(() => {
     }
 
     curModel = $(`#${$(this).attr("for")}`).attr("value");
-    if (curRegime === Regime.CHATBOT) {
-      $('.dialogue p').slice(2).remove();
-    } else {
-      $('.dialogue').empty();
-    }
+    $('.dialogue p').slice(2).remove();
 
     sessionLength = initialSessionLength;
     resetSession();
