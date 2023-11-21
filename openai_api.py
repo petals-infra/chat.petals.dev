@@ -1,9 +1,13 @@
 # Adapted from
 # https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/openai/api_server.py
-
+import argparse
+import json
 import time
 from http import HTTPStatus
 from typing import AsyncGenerator, Dict, List, Optional, Tuple, Union
+
+import torch
+import uvicorn
 from fastapi import Request, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse, Response
@@ -77,9 +81,9 @@ async def get_gen_prompt(request) -> str:
     conv = Conversation(
         name=conv.name,
         system_template=conv.system_template,
-        system_message=conv.system_message,
+        system_message="""A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.\n""",
         roles=conv.roles,
-        messages=list(conv.messages),
+        messages=[],
         offset=conv.offset,
         sep_style=SeparatorStyle(conv.sep_style),
         sep=conv.sep,
@@ -106,6 +110,8 @@ async def get_gen_prompt(request) -> str:
         conv.append_message(conv.roles[1], None)
         prompt = conv.get_prompt()
 
+    logger.info(f"Prompt: {prompt}")
+
     return prompt
 
 
@@ -113,18 +119,23 @@ async def check_length(
         request: Union[ChatCompletionRequest, CompletionRequest],
         model,
         tokenizer,
-        prompt: Optional[str] = None,
-        prompt_ids: Optional[List[int]] = None,
-) -> Tuple[List[int], Optional[JSONResponse]]:
+        prompt: Optional[Union[str, List[str]]] = None,
+        prompt_ids: Optional[Union[List[int], List[List[int]]]] = None,
+) -> Tuple[torch.LongTensor, Optional[JSONResponse]]:
     max_model_len = model.config.max_position_embeddings
     assert (not (prompt is None and prompt_ids is None)
             and not (prompt is not None and prompt_ids is not None)
             ), "Either prompt or prompt_ids should be provided."
     if prompt_ids is not None:
-        input_ids = prompt_ids
+        input_ids = torch.LongTensor(prompt_ids)
+        if len(input_ids.shape) == 1:
+            input_ids = input_ids.unsqueeze(0)
     else:
-        input_ids = tokenizer(prompt).input_ids
-    token_num = len(input_ids)
+        input_ids = torch.LongTensor(tokenizer(prompt).input_ids)
+        if len(input_ids.shape) == 1:
+            input_ids = input_ids.unsqueeze(0)
+
+    token_num = input_ids.shape[1]
 
     if request.max_tokens is None:
         request.max_tokens = max_model_len - token_num
@@ -268,9 +279,13 @@ async def create_chat_completion(request: ChatCompletionRequest,
 
             return response_json
 
-        async def completion_stream_generator(model) -> AsyncGenerator[str, None]:
-            with model.inference_session(max_length=model.config.max_length) as session:
-                # First chunk with role
+        async def completion_stream_generator(model, token_ids) -> AsyncGenerator[str, None]:
+            END_STRING = "data: [DONE]\n\n"
+            n_input_tokens = token_ids.shape[1]
+            max_new_tokens = generation_config.max_new_tokens
+            total_generated_tokens = 0  # Initialize total generated token count
+
+            with model.inference_session(max_length=max_new_tokens + n_input_tokens) as session:
                 for i in range(request.n):
                     choice_data = ChatCompletionResponseStreamChoice(
                         index=i,
@@ -283,28 +298,57 @@ async def create_chat_completion(request: ChatCompletionRequest,
                     data = chunk.json(exclude_unset=True, ensure_ascii=False)
                     yield f"data: {data}\n\n"
 
+                while total_generated_tokens < max_new_tokens:
+                    delta_q = []
+                    delta = []
 
-                model_output = session.generate_response(token_ids, **generation_config.to_diff_dict())
-                for response in model_output:
-                    response_json = create_stream_response_json(
-                        index=response.index,
-                        text=response.text,
-                        finish_reason=response.finish_reason,
-                    )
-                    yield f"data: {response_json}\n\n"
+                    while len(delta_q) + len(delta) < max_new_tokens:
+                        if total_generated_tokens >= max_new_tokens:
+                            break  # Stop generating if the max token limit is reached
 
-                # End of stream
-            yield "data: [DONE]\n\n"
+                        outputs = model.generate(
+                            inputs=token_ids,
+                            max_new_tokens=max_new_tokens - total_generated_tokens,
+                            # Adjust max_new_tokens based on tokens already generated
+                            session=session,
+                        )
+                        delta = outputs[0, n_input_tokens:].tolist()
+                        total_generated_tokens += len(delta)
 
-        return StreamingResponse(completion_stream_generator(model),
+                        logger.info(f"Generated {len(delta)} tokens")
+                        logger.info(f"Tokens generated: delta_q={repr(delta_q)}, delta={repr(delta)}")
+
+                        outputs_text = utils.safe_decode(tokenizer, delta_q + delta)
+
+                        if outputs_text[-10:].find("\ufffd") > -1:
+                            # If there's a replacement character, keep getting more tokens
+                            # until we can decode properly
+                            delta_q += delta
+                            logger.info(f"Retry generation {repr(outputs_text)}")
+                        else:
+                            response_json = create_stream_response_json(index=0, text=outputs_text)
+                            logger.info(f"Generated {repr(outputs_text)}")
+                            yield f"data: {response_json}\n\n"
+                            delta_q = []  # Clear delta_q for the next iteration
+                            token_ids = None  # Clear inputs for the next generation step
+
+                        if len(delta) > 0 and delta[-1] == tokenizer.eos_token_id:
+                            yield END_STRING
+                            return
+
+                yield END_STRING
+
+        return StreamingResponse(completion_stream_generator(model, token_ids),
                                  media_type="text/event-stream")
+
+    num_prompt_tokens = token_ids.shape[1]
 
     results_generator = model.generate(token_ids, **generation_config.to_diff_dict())
 
     choices = []
     for index, output_tokens in enumerate(results_generator):
         text = tokenizer.decode(
-            output_tokens,
+            output_tokens[num_prompt_tokens:],
             skip_special_tokens=skip_special_tokens,
             spaces_between_special_tokens=spaces_between_special_tokens,
         )
@@ -316,7 +360,6 @@ async def create_chat_completion(request: ChatCompletionRequest,
         )
         choices.append(choice_data)
 
-    num_prompt_tokens = len(token_ids)
     num_generated_tokens = sum(
         len(output) for output in results_generator)
     usage = UsageInfo(
@@ -427,6 +470,7 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
             # output_scores=True,  # Example: set to True if you want to output prediction scores
         )
     except ValueError as e:
+        logger.error(f"Error in generation config: {e}")
         return create_error_response(HTTPStatus.BAD_REQUEST, str(e))
 
     will_do_streaming = (request.stream
@@ -462,22 +506,57 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
 
             return response_json
 
-        async def completion_stream_generator(model) -> AsyncGenerator[str, None]:
-            with model.inference_session(max_length=model.config.max_length) as session:
+        async def completion_stream_generator(model, token_ids) -> AsyncGenerator[str, None]:
+            END_STRING = "data: [DONE]\n\n"
+            n_input_tokens = token_ids.shape[1]
+            max_new_tokens = generation_config.max_new_tokens
+            total_generated_tokens = 0  # Initialize total generated token count
 
-                model_output = session.generate_response(**generation_config.to_diff_dict())
-                for response in model_output:
-                    response_json = create_stream_response_json(
-                        index=response.index,
-                        text=response.text,
-                        finish_reason=response.finish_reason,
-                    )
-                    yield f"data: {response_json}\n\n"
+            with model.inference_session(max_length=max_new_tokens + n_input_tokens) as session:
+                while total_generated_tokens < max_new_tokens:
+                    delta_q = []
+                    delta = []
+
+                    while len(delta_q) + len(delta) < max_new_tokens:
+                        if total_generated_tokens >= max_new_tokens:
+                            break  # Stop generating if the max token limit is reached
+
+                        outputs = model.generate(
+                            inputs=token_ids,
+                            max_new_tokens=max_new_tokens - total_generated_tokens,
+                            # Adjust max_new_tokens based on tokens already generated
+                            session=session,
+                        )
+                        delta = outputs[0, n_input_tokens:].tolist()
+                        total_generated_tokens += len(delta)
+
+                        logger.info(f"Generated {len(delta)} tokens")
+                        logger.info(f"Tokens generated: delta_q={repr(delta_q)}, delta={repr(delta)}")
+
+                        outputs_text = utils.safe_decode(tokenizer, delta_q + delta)
+
+                        if outputs_text[-10:].find("\ufffd") > -1:
+                            # If there's a replacement character, keep getting more tokens
+                            # until we can decode properly
+                            delta_q += delta
+                            logger.info(f"Retry generation {repr(outputs_text)}")
+                        else:
+                            response_json = create_stream_response_json(index=0, text=outputs_text)
+                            logger.info(f"Generated {repr(outputs_text)}")
+                            yield f"data: {response_json}\n\n"
+                            delta_q = []  # Clear delta_q for the next iteration
+                            token_ids = None  # Clear inputs for the next generation step
+
+                        if len(delta) > 0 and delta[-1] == tokenizer.eos_token_id:
+                            yield END_STRING
+                            return
+
                 # End of stream
-                yield "data: [DONE]\n\n"
+                yield END_STRING
 
-        return StreamingResponse(completion_stream_generator(model),
-                                 media_type="text/event-stream")
+        return StreamingResponse(completion_stream_generator(model, token_ids), media_type="text/event-stream")
+
+    logger.info(f"Generating with config {generation_config.to_diff_dict()}")
 
     results_generator = model.generate(token_ids, **generation_config.to_diff_dict())
 
@@ -528,3 +607,21 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
                                  media_type="text/event-stream")
 
     return response
+
+
+# run flask as main
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Petals OpenAI-Compatible RESTful API server.")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="host name")
+    parser.add_argument("--port", type=int, default=8000, help="port number")
+
+    args = parser.parse_args()
+
+    uvicorn.run(
+        app,
+        host=args.host,
+        port=args.port,
+        log_level="info",
+        timeout_keep_alive=TIMEOUT_KEEP_ALIVE
+    )

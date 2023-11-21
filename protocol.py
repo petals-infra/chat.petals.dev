@@ -58,18 +58,18 @@ class UsageInfo(BaseModel):
 class ChatCompletionRequest(BaseModel):
     model: str
     messages: Union[str, List[Dict[str, str]]]
-    temperature: Optional[float] = 0.7
-    top_p: Optional[float] = 1.0
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
     n: Optional[int] = 1
-    max_tokens: Optional[int] = None
-    stop: Optional[Union[str, List[str]]] = Field(default_factory=list)
+    max_tokens: int = 20
+    stop: Optional[Union[str, bool]] = False
     stream: Optional[bool] = False
     presence_penalty: Optional[float] = 0.0
     logit_bias: Optional[Dict[str, float]] = None
     user: Optional[str] = None
     # Additional parameters supported by Petals
     best_of: Optional[int] = None
-    top_k: Optional[int] = -1
+    top_k: Optional[int] = 50
     use_beam_search: Optional[bool] = False
     skip_special_tokens: Optional[bool] = True
     spaces_between_special_tokens: Optional[bool] = True
@@ -78,18 +78,18 @@ class ChatCompletionRequest(BaseModel):
 class CompletionRequest(BaseModel):
     model: str
     prompt: Union[List[int], List[List[int]], str, List[str]]
-    temperature: Optional[float] = 0.7
-    top_p: Optional[float] = 1.0
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
     n: Optional[int] = 1
-    max_tokens: Optional[int] = None
-    stop: Optional[Union[str, List[str]]] = Field(default_factory=list)
+    max_tokens: int = 20
+    stop: Optional[Union[str, bool]] = False
     stream: Optional[bool] = False
     presence_penalty: Optional[float] = 0.0
     logit_bias: Optional[Dict[str, float]] = None
     user: Optional[str] = None
     # Additional parameters supported by Petals
     best_of: Optional[int] = None
-    top_k: Optional[int] = -1
+    top_k: Optional[int] = 50
     use_beam_search: Optional[bool] = False
     skip_special_tokens: Optional[bool] = True
     spaces_between_special_tokens: Optional[bool] = True
