@@ -173,30 +173,6 @@ async def show_available_models():
     return ModelList(data=model_cards)
 
 
-def create_logprobs(token_ids: List[int],
-                    id_logprobs: List[Dict[int, float]],
-                    initial_text_offset: int = 0) -> LogProbs:
-    """Create OpenAI-style logprobs."""
-    logprobs = LogProbs()
-    last_token_len = 0
-    for token_id, id_logprob in zip(token_ids, id_logprobs):
-        token = tokenizer.convert_ids_to_tokens(token_id)
-        logprobs.tokens.append(token)
-        logprobs.token_logprobs.append(id_logprob[token_id])
-        if len(logprobs.text_offset) == 0:
-            logprobs.text_offset.append(initial_text_offset)
-        else:
-            logprobs.text_offset.append(logprobs.text_offset[-1] +
-                                        last_token_len)
-        last_token_len = len(token)
-
-        logprobs.top_logprobs.append({
-            tokenizer.convert_ids_to_tokens(i): p
-            for i, p in id_logprob.items()
-        })
-    return logprobs
-
-
 @app.post("/v1/chat/completions")
 async def create_chat_completion(request: ChatCompletionRequest,
                                  raw_request: Request):
@@ -216,7 +192,6 @@ async def create_chat_completion(request: ChatCompletionRequest,
         return error_check_ret
 
     if request.logit_bias is not None and len(request.logit_bias) > 0:
-        # TODO: support logit_bias in Petals engine.
         return create_error_response(HTTPStatus.BAD_REQUEST,
                                      "logit_bias is not currently supported")
 
@@ -236,7 +211,7 @@ async def create_chat_completion(request: ChatCompletionRequest,
         spaces_between_special_tokens = request.spaces_between_special_tokens
 
         if request.presence_penalty > 0.0:
-            logger.warning("presence_penalty is not supported yet")
+            logger.warning("Presence_penalty is not supported yet")
 
         generation_config = GenerationConfig(
             num_return_sequences=request.n,
@@ -413,7 +388,6 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
         return error_check_ret
 
     if request.logit_bias is not None and len(request.logit_bias) > 0:
-        # TODO: support logit_bias in Petals.
         return create_error_response(HTTPStatus.BAD_REQUEST,
                                      "logit_bias is not currently supported")
 
@@ -432,7 +406,6 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
             use_token_ids = True
             prompt = request.prompt
         elif isinstance(first_element, (str, list)):
-            # TODO: handles multiple prompt case in list[list[int]]
             if len(request.prompt) > 1:
                 return create_error_response(
                     HTTPStatus.BAD_REQUEST,
@@ -473,16 +446,12 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
         logger.error(f"Error in generation config: {e}")
         return create_error_response(HTTPStatus.BAD_REQUEST, str(e))
 
+    # Similar to the OpenAI API, when n != best_of, we do not stream the
+    # results. In addition, we do not stream the results when use beam search.
     will_do_streaming = (request.stream
                          and (request.best_of is None or request.n == request.best_of)
                          and not request.use_beam_search)
 
-    # Similar to the OpenAI API, when n != best_of, we do not stream the
-    # results. In addition, we do not stream the results when use beam search.
-    # stream = (request.stream
-    #           and (request.best_of is None or request.n == request.best_of)
-    #           and not request.use_beam_search)
-    #
     if will_do_streaming:
         def create_stream_response_json(
                 index: int,
