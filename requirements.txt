@@ -2,4 +2,5 @@ git+https://github.com/bigscience-workshop/petals
 Flask
 flask-sock
 flask-cors
+fschat
 gunicorn[gthread]
