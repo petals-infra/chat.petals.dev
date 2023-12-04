@@ -183,7 +183,8 @@ async def create_chat_completion(request: ChatCompletionRequest,
 
     NOTE: Currently we do not support the following features:
         - function_call (Users should implement this by themselves)
-        - logit_bias (to be supported by Petals engine)
+        - presence_penalty (since the HF generation does not currently support it)
+        - logit_bias
     """
     logger.info(f"Received chat completion request: {request}")
 
@@ -377,9 +378,8 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
           getting the logprobs of prompt tokens)
         - suffix (the language models we currently support do not support
           suffix)
-        - logit_bias (to be supported by Petals engine)
-        - stream (to be supported by Petals engine)
-        - logprobs (to be supported by Petals engine)
+        - presence_penalty (since the HF generation does not currently support it)
+        - logit_bias
     """
     logger.info(f"Received completion request: {request}")
 
@@ -581,7 +581,7 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
 # run flask as main
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Petals OpenAI-Compatible RESTful API server.")
+        description="Petals OpenAI-Compatible REST full API server.")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="host name")
     parser.add_argument("--port", type=int, default=8000, help="port number")
 
