@@ -14,7 +14,7 @@ You can try it out at **https://chat.petals.dev** or run the backend on your ser
 git clone https://github.com/petals-infra/chat.petals.dev.git
 cd chat.petals.dev
 pip install -r requirements.txt
-flask run --host=0.0.0.0 --port=5000
+python3 openai_api.py --host=0.0.0.0 --port=5000
 ```
 
 🦙 **Want to serve Llama 2?** Request access to its weights at the ♾️ [Meta AI website](https://ai.meta.com/resources/models-and-libraries/llama-downloads/) and 🤗 [Model Hub](https://huggingface.co/meta-llama/Llama-2-70b-hf), then run `huggingface-cli login` in the terminal before starting the web app. If you don't want Llama 2, just remove the `meta-llama` models from [config.py](https://github.com/petals-infra/chat.petals.dev/blob/main/config.py).
@@ -22,19 +22,17 @@ flask run --host=0.0.0.0 --port=5000
 🦄 **Deploying with Gunicorn.** In production, we recommend using gunicorn instead of the Flask dev server:
 
 ```bash
-gunicorn app:app --bind 0.0.0.0:5000 --worker-class gthread --threads 100 --timeout 1000
+gunicorn openai_api:app --bind 0.0.0.0:5000 --worker-class gthread --threads 4 --timeout 1000
 ```
-
-The chat uses the WebSocket API under the hood.
 
 ## APIs
 
-The backend provides two APIs endpoints:
+The backend provides three APIs endpoints:
 
-- [WebSocket API](#websocket-api-apiv2generate) (`/api/v2/generate`, recommended)
+- [OpenAI API Format Completion](#openai-api-v1completions) (`/v1/completions`, recommended)
+- [OpenAI API Format Chat](#openai-api-v1chatcompletions) (`/v1/chat/completions`, recommended)
+- [WebSocket API](#websocket-api-apiv2generate) (`/api/v2/generate`)
 - [HTTP API](#http-api-apiv1) (`/api/v1/...`)
-
-Please use the WebSocket API when possible - it is much faster, more powerful, and consumes less resources.
 
 If you develop your own web app, you can use our endpoint at `https://chat.petals.dev/api/...` for research and development, then set up your own backend for production using the commands above.
 
@@ -60,6 +58,43 @@ If you develop your own web app, you can use our endpoint at `https://chat.petal
 | Llama 2 (70B, 70B-Chat), Llama-65B, Guanaco-65B | 1.05 GB | 2.1 GB |
 | BLOOM-176B, BLOOMZ-176B | 7.19 GB | 14.38 GB |
 </details>
+
+## OpenAI Format API
+
+### Overview
+
+Petals Chat introduces an API compatible with the OpenAI format, providing flexibility and familiarity for users accustomed to OpenAI's API structure. This new format is now the primary option, with other formats considered deprecated.
+
+### API Endpoints
+
+Two key API endpoints are provided in this format:
+
+1. **POST /v1/completions**: For general text completions.
+2. **POST /v1/chat/completions**: Specifically designed for chat-like interactions.
+
+### Parameters
+
+#### ChatCompletionRequest and CompletionRequest
+
+Both endpoints use similar request structures, defined by the `ChatCompletionRequest` and `CompletionRequest` classes, respectively:
+
+- **model (str)**: Specifies the model to use.
+- **messages (Union[str, List[Dict[str, str]]])**: Used for chat interactions, defining the messages exchanged.
+- **temperature (Optional[float])**: Sets the temperature for randomness in responses.
+- **top_p (Optional[float])**: Controls the nucleus sampling.
+- **n (Optional[int])**: Number of completions to generate.
+- **max_tokens (int)**: Maximum number of tokens to generate.
+- **stop (Optional[Union[str, bool]])**: Sequence or flag indicating when to stop generation.
+- **stream (Optional[bool])**: Determines if the response should be streamed.
+- **presence_penalty (Optional[float])**: Adjusts the likelihood of new concepts.
+- **logit_bias (Optional[Dict[str, float]])**: Applies biases to specific tokens.
+- **user (Optional[str])**: User identifier.
+- Additional Parameters by Petals:
+  - **best_of (Optional[int])** (only for `/v1/completions`): Number of completions to generate and return.
+  - **top_k (Optional[int])** Controls the top-k sampling.
+  - **use_beam_search (Optional[bool])**  Whether to use beam search instead of sampling.
+  - **skip_special_tokens (Optional[bool])** Whether to skip special tokens.
+  - **spaces_between_special_tokens (Optional[bool])** Whether to add spaces between special tokens.
 
 ## WebSocket API (`/api/v2/generate`)
 
